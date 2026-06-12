@@ -1,0 +1,180 @@
+[
+  {
+    "timestamp": "2026-04-16T13:43:14.447427",
+    "class": "big_bearings",
+    "confidence": 97.1,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_231930_jpg.rf.8ee8f88bc4e55bd2035bc9a1a5073c0a.jpg"
+  },
+  {
+    "timestamp": "2026-04-16T13:43:23.508353",
+    "class": "big_bearings",
+    "confidence": 96.5,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_232303_jpg.rf.d327eb4828c5b7e4e707ee268638c59a.jpg"
+  },
+  {
+    "timestamp": "2026-04-16T13:43:44.234724",
+    "class": "big_bearings",
+    "confidence": 99.4,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_232603_jpg.rf.1794e007daed3dcbc8b15ec68e19b3e3.jpg"
+  },
+  {
+    "timestamp": "2026-04-16T13:43:51.475704",
+    "class": "medium_bearing",
+    "confidence": 96.3,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_233317_jpg.rf.b86bbb08ace0fe39456562df368e6990.jpg"
+  },
+  {
+    "timestamp": "2026-04-16T13:44:00.045506",
+    "class": "medium_bearing",
+    "confidence": 96.0,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_233822_jpg.rf.11d91b6bf554500bd82e2ca660926ab6.jpg"
+  },
+  {
+    "timestamp": "2026-04-16T13:44:08.392119",
+    "class": "medium_bearing",
+    "confidence": 96.9,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_233515_jpg.rf.9e2daaa9a33fcffcdd9632510f9397b6.jpg"
+  },
+  {
+    "timestamp": "2026-04-16T13:44:15.447144",
+    "class": "small_bearing",
+    "confidence": 93.9,
+    "shift": "Morning",
+    "image_name": "IMG_20260414_234722_jpg.rf.d4a2a93a1658d2cab2ef1b12b33e98ed.jpg"
+  },
+  {
+    "timestamp": "2026-05-21T08:24:53.292630",
+    "class": "medium_bearing",
+    "confidence": 85.9,
+    "shift": "Morning",
+    "image_name": "IMG_20260415_114900_jpg.rf.5914d8b56902e329722da2dfb8857573.jpg",
+    "measurement": {
+      "class": "608Z",
+      "outer_diameter_mm": 22.0,
+      "inner_diameter_mm": null,
+      "status": "PASS",
+      "reason": "ID not detected, accepted by OD",
+      "standard_outer_diameter_mm": 22.0,
+      "standard_inner_diameter_mm": 8.0,
+      "tolerance_mm": 2.0,
+      "id_tolerance_mm": 3.0,
+      "outer_error_mm": 0.0,
+      "inner_error_mm": null,
+      "outer_diameter_px": 34,
+      "inner_diameter_px": null,
+      "pixel_to_mm": 0.647059,
+      "detection_method": "hough+contour"
+    },
+    "status": "PASS"
+  },
+  {
+    "timestamp": "2026-05-25T10:17:55.580455",
+    "class": "big_bearings",
+    "confidence": 78.3,
+    "shift": "Morning",
+    "image_name": "WIN_20260525_10_17_04_Pro.jpg",
+    "measurement": {
+      "class": "6301Z",
+      "outer_diameter_mm": 37.0,
+      "inner_diameter_mm": null,
+      "status": "PASS",
+      "reason": "Stable by frame voting",
+      "standard_outer_diameter_mm": 37.0,
+      "standard_inner_diameter_mm": 12.0,
+      "tolerance_mm": 2.0,
+      "id_tolerance_mm": 3.0,
+      "outer_error_mm": 0.0,
+      "inner_error_mm": null,
+      "outer_diameter_px": 452,
+      "inner_diameter_px": null,
+      "pixel_to_mm": 0.081858,
+      "detection_method": "hough+contour",
+      "raw_status": "PASS"
+    },
+    "status": "PASS"
+  },
+  {
+    "timestamp": "2026-05-25T10:19:08.378456",
+    "class": "medium_bearing",
+    "confidence": 84.2,
+    "shift": "Morning",
+    "image_name": "WIN_20260525_10_18_42_Pro.jpg",
+    "measurement": {
+      "class": "608Z",
+      "outer_diameter_mm": 22.0,
+      "inner_diameter_mm": null,
+      "status": "PASS",
+      "reason": "Stable by frame voting",
+      "standard_outer_diameter_mm": 22.0,
+      "standard_inner_diameter_mm": 8.0,
+      "tolerance_mm": 2.0,
+      "id_tolerance_mm": 3.0,
+      "outer_error_mm": 0.0,
+      "inner_error_mm": null,
+      "outer_diameter_px": 490,
+      "inner_diameter_px": null,
+      "pixel_to_mm": 0.044898,
+      "detection_method": "hough+contour",
+      "raw_status": "PASS"
+    },
+    "status": "PASS"
+  },
+  {
+    "timestamp": "2026-05-25T10:20:32.123589",
+    "class": "medium_bearing",
+    "confidence": 96.6,
+    "shift": "Morning",
+    "image_name": "IMG_20260501_143651_13_jpg.rf.89de7af40c0f05df56089e475efe3d24.jpg",
+    "measurement": {
+      "class": "608Z",
+      "outer_diameter_mm": 22.0,
+      "inner_diameter_mm": 7.02,
+      "status": "PASS",
+      "reason": "Stable by frame voting",
+      "standard_outer_diameter_mm": 22.0,
+      "standard_inner_diameter_mm": 8.0,
+      "tolerance_mm": 2.0,
+      "id_tolerance_mm": 3.0,
+      "outer_error_mm": 0.0,
+      "inner_error_mm": 0.98,
+      "outer_diameter_px": 94,
+      "inner_diameter_px": 30,
+      "pixel_to_mm": 0.234043,
+      "detection_method": "hough+contour",
+      "raw_status": "PASS"
+    },
+    "status": "PASS"
+  },
+  {
+    "timestamp": "2026-05-25T10:46:11.018614",
+    "class": "medium_bearing",
+    "confidence": 94.7,
+    "shift": "Morning",
+    "image_name": "WIN_20260525_10_18_42_Pro.jpg",
+    "measurement": {
+      "class": "608Z",
+      "outer_diameter_mm": 22.0,
+      "inner_diameter_mm": null,
+      "status": "PASS",
+      "reason": "Stable by frame voting",
+      "standard_outer_diameter_mm": 22.0,
+      "standard_inner_diameter_mm": 8.0,
+      "tolerance_mm": 2.0,
+      "id_tolerance_mm": 3.0,
+      "outer_error_mm": 0.0,
+      "inner_error_mm": null,
+      "outer_diameter_px": 480,
+      "inner_diameter_px": null,
+      "pixel_to_mm": 0.045833,
+      "detection_method": "hough+contour",
+      "raw_status": "PASS"
+    },
+    "status": "PASS"
+  }
+]

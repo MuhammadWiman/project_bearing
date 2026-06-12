@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-socketio
+python-multipart
+jinja2
+ultralytics
+opencv-python
+Pillow
+pyserial

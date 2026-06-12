@@ -1,0 +1,21 @@
+{
+  "settings_version": "0.0.6",
+  "datasets_dir": "E:\\Project\\project_skripsi\\bearing_web_app\\datasets",
+  "weights_dir": "weights",
+  "runs_dir": "runs",
+  "uuid": "df1676e88badc48eaaccb5027ee398116fbe6375de0d24721583a448cf31028c",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "hub": true,
+  "mlflow": true,
+  "neptune": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}
