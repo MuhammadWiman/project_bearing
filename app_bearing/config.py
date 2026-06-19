@@ -21,6 +21,7 @@ BAUD_RATE = 9600
 
 # Production target
 DAILY_TARGET = 1000
+INSPECTION_DB_PATH = 'inspection_qc.db'
 
 # Live inspection refresh interval in seconds.
 # Naikkan nilainya jika tampilan live terlalu cepat berubah.

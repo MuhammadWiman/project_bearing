@@ -6,6 +6,9 @@
     <title>Industrial Bearing Inspection System</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,21 +17,36 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            background: #0a0e1a;
-            color: #e0e0e0;
+        :root {
+            --industrial-bg: #06020f;
+            --industrial-card: rgba(18, 10, 36, 0.7);
+            --industrial-card-hover: rgba(32, 16, 61, 0.85);
+            --industrial-panel: rgba(11, 5, 24, 0.9);
+            --industrial-border: rgba(155, 70, 255, 0.25);
+            --industrial-border-glow: rgba(0, 229, 255, 0.4);
+            --industrial-accent: #00e5ff;
+            --industrial-accent-glow: rgba(0, 229, 255, 0.3);
+            --industrial-accent-2: #ff3d9a;
+            --industrial-success: #2ed573;
+            --industrial-warning: #ffa502;
+            --industrial-danger: #ff4757;
+            --industrial-purple: #9b46ff;
+            --industrial-text: #f1f0f6;
+            --industrial-text-muted: #9587a8;
+            --industrial-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --font-ui: 'Montserrat', 'Segoe UI', sans-serif;
         }
 
-        :root {
-            --industrial-bg: #0a0e1a;
-            --industrial-card: #141a2a;
-            --industrial-border: #2a3440;
-            --industrial-accent: #00a8ff;
-            --industrial-success: #00c853;
-            --industrial-warning: #ff9800;
-            --industrial-danger: #ff3b3b;
-            --industrial-text-muted: #8a8f9a;
+        body {
+            font-family: var(--font-ui);
+            font-weight: 400;
+            min-height: 100vh;
+            background: 
+                radial-gradient(circle at 80% 10%, rgba(255, 61, 154, 0.12), transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(0, 229, 255, 0.12), transparent 45%),
+                linear-gradient(135deg, #05010a 0%, #0f051d 50%, #06010b 100%);
+            color: var(--industrial-text);
+            overflow-x: hidden;
         }
 
         .dashboard {
@@ -37,67 +55,255 @@
             overflow: hidden;
         }
 
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 280px;
-            background: #0f1422;
+            width: 260px;
+            background: linear-gradient(180deg, #090314 0%, #05010c 100%);
             border-right: 1px solid var(--industrial-border);
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
+            z-index: 10;
         }
 
         .logo {
-            padding: 24px;
-            border-bottom: 1px solid var(--industrial-border);
+            padding: 28px 24px;
+            border-bottom: 1px solid rgba(155, 70, 255, 0.15);
+            background: rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
         }
 
         .logo h2 {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 i {
             color: var(--industrial-accent);
-            font-size: 1.5rem;
+            text-shadow: 0 0 12px var(--industrial-accent-glow);
         }
 
         .logo p {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
+            font-weight: 700;
             color: var(--industrial-text-muted);
-            margin-top: 4px;
+            margin-top: 6px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
         }
 
         .nav-menu {
             flex: 1;
-            padding: 20px 0;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .nav-item {
-            padding: 12px 24px;
+            height: 46px;
+            padding: 0 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             color: var(--industrial-text-muted);
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(0, 168, 255, 0.1);
-            color: var(--industrial-accent);
-            border-left: 3px solid var(--industrial-accent);
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            position: relative;
         }
 
         .nav-item i {
-            width: 24px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            transition: transform 0.3s;
         }
 
+        .nav-item:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item:hover i {
+            transform: translateX(2px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 229, 255, 0.02) 100%);
+            color: var(--industrial-accent);
+            font-weight: 700;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 4px;
+            background: var(--industrial-accent);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px var(--industrial-accent);
+        }
+
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 0 32px 32px;
+        }
+
+        /* --- TOPBAR --- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 80px;
+            margin: 0 -32px 28px;
+            padding: 16px 32px;
+            background: rgba(6, 2, 15, 0.85);
+            border-bottom: 1px solid rgba(155, 70, 255, 0.15);
+            backdrop-filter: blur(16px);
+        }
+
+        .search-shell {
+            display: flex;
+            align-items: center;
+            height: 42px;
+            width: 320px;
+            border: 1px solid var(--industrial-border);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0 16px;
+            transition: all 0.3s;
+        }
+
+        .search-shell:focus-within {
+            border-color: var(--industrial-accent);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+            width: 360px;
+        }
+
+        .search-shell span {
+            flex: 1;
+            color: var(--industrial-text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .search-shell i {
+            color: var(--industrial-text-muted);
+            font-size: 0.85rem;
+        }
+
+        .system-strip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-chip {
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 14px;
+            border: 1px solid var(--industrial-border);
+            border-radius: 17px;
+            background: rgba(18, 10, 36, 0.6);
+            color: #e2daf0;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-chip i {
+            color: var(--industrial-purple);
+        }
+
+        /* --- HEADINGS --- */
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-kicker {
+            color: var(--industrial-accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 4px;
+        }
+
+        .page-heading h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        /* --- CARDS & CARDS GRID --- */
+        .camera-section {
+            background: var(--industrial-card);
+            border: 1px solid var(--industrial-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--industrial-shadow);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s;
+        }
+
+        .camera-section:hover {
+            border-color: rgba(155, 70, 255, 0.4);
+        }
+
+        .camera-section h3 {
+            color: #fff;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .camera-section h3 i {
+            color: var(--industrial-accent);
+        }
+
+        .panel-subtitle {
+            margin-bottom: 20px;
+            color: var(--industrial-text-muted);
+            font-size: 0.75rem;
+            font-weight: 400;
+            line-height: 1.5;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
             margin-bottom: 24px;
         }
 
@@ -106,126 +312,560 @@
             border: 1px solid var(--industrial-border);
             border-radius: 12px;
             padding: 20px;
-            transition: transform 0.2s;
+            box-shadow: var(--industrial-shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            background: var(--industrial-card-hover);
         }
 
-        .stat-header {
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 130px;
+        }
+
+        .metric-card::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 4px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent, var(--industrial-accent)), transparent);
+        }
+
+        .metric-top {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .metric-label {
             color: var(--industrial-text-muted);
-            font-size: 0.85rem;
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
+        .metric-value {
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
         }
 
-        .camera-section {
-            background: var(--industrial-card);
-            border: 1px solid var(--industrial-border);
-            border-radius: 12px;
-            padding: 20px;
+        .metric-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            color: var(--accent, var(--industrial-accent));
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.2rem;
+        }
+
+        .metric-note {
+            color: var(--industrial-text-muted);
+            font-size: 0.72rem;
+            margin-top: 12px;
+            line-height: 1.4;
+        }
+
+        /* --- DASHBOARD SPLIT BOARD --- */
+        .dashboard-board {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .target-value {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+        }
+
+        .target-value strong {
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .target-value span {
+            color: var(--industrial-accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .gauge-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            height: 16px;
+            overflow: hidden;
             margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .gauge-fill {
+            background: linear-gradient(90deg, var(--industrial-purple), var(--industrial-accent));
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #000;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+            transition: width 0.5s ease;
+        }
+
+        .bearing-mix {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .mix-row {
+            display: grid;
+            grid-template-columns: 75px 1fr 40px;
+            align-items: center;
+            gap: 12px;
+            color: var(--industrial-text);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .mix-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        .mix-fill {
+            width: var(--mix, 0%);
+            height: 100%;
+            border-radius: 3px;
+            background: var(--accent, var(--industrial-accent));
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .mix-row span {
+            text-align: right;
+            color: var(--industrial-text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* --- BUTTONS & CONTROLS --- */
         .camera-controls {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
         }
 
         .camera-select {
-            background: var(--industrial-bg);
+            font-family: var(--font-ui);
+            background: #110722;
             border: 1px solid var(--industrial-border);
-            color: var(--industrial-text-muted);
-            padding: 8px 16px;
-            border-radius: 6px;
+            color: #fff;
+            padding: 0 16px;
+            height: 38px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .camera-select:focus {
+            border-color: var(--industrial-accent);
         }
 
         .btn {
-            padding: 8px 20px;
+            font-family: var(--font-ui);
+            height: 38px;
+            padding: 0 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-primary { background: var(--industrial-accent); color: white; }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #00b8ff, #00e5ff); color: #05020f; }
         .btn-danger { background: var(--industrial-danger); color: white; }
         .btn-success { background: var(--industrial-success); color: white; }
-        .btn-warning { background: var(--industrial-warning); color: white; }
-        .btn-purple { background: #9c27b0; color: white; }
+        .btn-warning { background: var(--industrial-warning); color: #0e0800; }
+        .btn-purple { background: var(--industrial-purple); color: white; }
 
-        .video-container {
+        /* --- TUNING SLIDERS --- */
+        .inspection-tuning {
             display: grid;
-            grid-template-columns: repeat(2, minmax(280px, 1fr));
-            gap: 16px;
-            align-items: start;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        .camera-frame {
-            background: var(--industrial-bg);
+        .tuning-control {
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--industrial-border);
             border-radius: 8px;
             padding: 12px;
         }
 
-        .camera-frame h3 {
-            font-size: 0.95rem;
+        .tuning-control label {
+            display: flex;
+            justify-content: space-between;
             color: var(--industrial-text-muted);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin-bottom: 10px;
+        }
+
+        .tuning-control strong {
+            color: var(--industrial-accent);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--industrial-accent);
+            box-shadow: 0 0 8px var(--industrial-accent);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .tuning-control select {
+            width: 100%;
+            background: #110722;
+            border: 1px solid rgba(155, 70, 255, 0.4);
+            color: #fff;
+            padding: 6px;
+            border-radius: 4px;
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            outline: none;
+        }
+
+        /* --- VIDEO / FRAMES --- */
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .camera-frame {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--industrial-border);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .camera-frame h3 {
+            font-size: 0.75rem;
+            color: var(--industrial-text-muted);
+            margin-bottom: 12px;
         }
 
         .camera-frame img {
             width: 100%;
-            min-height: 260px;
+            height: 300px;
             object-fit: contain;
-            background: #000;
-            border: 1px solid var(--industrial-border);
-            border-radius: 8px;
+            background: #020005;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
             display: block;
         }
 
-        .detection-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin: 4px;
+        /* --- LIVE QC WORKSTATION LAYOUT --- */
+        #inspection-section .page-heading {
+            margin-bottom: 10px;
         }
 
-        .badge-ok { background: var(--industrial-success); color: white; }
-        .badge-warning { background: var(--industrial-warning); color: white; }
-        .badge-reject { background: var(--industrial-danger); color: white; }
-
-        .inspection-results {
-            margin-top: 20px;
+        .live-qc-layout {
             display: grid;
+            grid-template-columns: minmax(0, 1fr) clamp(380px, 34%, 520px);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .live-qc-left,
+        .live-qc-right {
+            display: grid;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .live-qc-left {
+            overflow: hidden;
+        }
+
+        #inspection-section .camera-section {
+            margin-bottom: 0;
+        }
+
+        .live-camera-card .camera-controls {
+            display: grid;
+            grid-template-columns: minmax(240px, 1fr) repeat(3, minmax(112px, 140px));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .live-camera-card .camera-select,
+        .live-camera-card .btn {
+            width: 100%;
+            justify-content: center;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .live-camera-card .inspection-tuning {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .live-camera-card .tuning-control {
+            min-width: 0;
+            min-height: 86px;
+            padding: 10px;
+        }
+
+        .live-camera-card .tuning-control label {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: start;
+            gap: 6px;
+            min-height: 30px;
+            margin-bottom: 12px;
+            line-height: 1.25;
+        }
+
+        .live-camera-card .tuning-control label span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .live-camera-card .tuning-control label strong {
+            white-space: nowrap;
+            text-align: right;
+            line-height: 1.2;
+        }
+
+        .live-camera-card .tuning-control select {
+            height: 36px;
+        }
+
+        .live-camera-card .video-container {
             gap: 12px;
         }
 
+        .live-camera-card .camera-frame {
+            padding: 8px;
+        }
+
+        .live-camera-card .camera-frame img {
+            height: clamp(210px, 27vh, 290px);
+        }
+
+        .camera-meta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            color: var(--industrial-text-muted);
+            font-size: 0.66rem;
+            font-weight: 600;
+        }
+
+        .live-conveyor-card .stats-grid {
+            grid-template-columns: minmax(150px, 1.15fr) minmax(120px, 0.9fr) minmax(120px, 0.95fr);
+            gap: 12px;
+            margin: 8px 0 14px;
+        }
+
+        .live-conveyor-card .stat-card {
+            min-width: 0;
+            min-height: 96px;
+            padding: 14px;
+        }
+
+        .live-conveyor-card .metric-value {
+            overflow: visible;
+            font-size: clamp(1.25rem, 2.6vw, 1.55rem);
+            line-height: 1.05;
+            white-space: nowrap;
+        }
+
+        #conveyorRunningStatus {
+            max-width: 100%;
+            overflow: hidden;
+            font-size: clamp(1.15rem, 2.2vw, 1.35rem);
+            text-overflow: clip;
+        }
+
+        .live-conveyor-card .metric-label {
+            line-height: 1.25;
+        }
+
+        .live-conveyor-card .camera-controls {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(92px, 1fr));
+            gap: 12px;
+            margin: 0 0 16px;
+        }
+
+        .live-conveyor-card .btn {
+            width: 100%;
+            justify-content: center;
+            min-width: 0;
+            height: 46px;
+            padding: 0 10px;
+            line-height: 1.15;
+            text-align: center;
+        }
+
+        .speed-control {
+            margin-bottom: 10px;
+        }
+
+        .speed-control label {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            color: var(--industrial-text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .auto-stop-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--industrial-text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .event-card .event-log {
+            height: 250px;
+        }
+
+        /* --- BADGES & LOGS TABLE --- */
+        .detection-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-ok { background: rgba(46, 213, 115, 0.15); color: var(--industrial-success); border: 1px solid rgba(46, 213, 115, 0.3); }
+        .badge-warning { background: rgba(255, 165, 2, 0.15); color: var(--industrial-warning); border: 1px solid rgba(255, 165, 2, 0.3); }
+        .badge-reject { background: rgba(255, 71, 87, 0.15); color: var(--industrial-danger); border: 1px solid rgba(255, 71, 87, 0.3); }
+
+        .inspection-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .inspection-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .inspection-stats-grid .stat-card {
+            min-height: 96px;
+            padding: 14px;
+        }
+
+        .inspection-stats-grid .metric-value {
+            font-size: 1.6rem;
+        }
+
+        #inspection-section .inspection-stats-grid {
+            grid-template-columns: repeat(4, minmax(105px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        #inspection-section .inspection-stats-grid .stat-card {
+            min-height: 66px;
+            padding: 10px;
+        }
+
+        #inspection-section .inspection-stats-grid .metric-value {
+            font-size: 1.1rem;
+        }
+
         .detection-result-card {
-            background: var(--industrial-bg);
+            background: rgba(0, 0, 0, 0.22);
             border: 1px solid var(--industrial-border);
             border-left: 4px solid var(--industrial-accent);
-            border-radius: 8px;
-            padding: 14px 16px;
+            border-radius: 10px;
+            padding: 14px;
         }
 
         .detection-result-card.pass {
@@ -239,329 +879,264 @@
         .detection-result-title {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 10px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: #fff;
+            font-size: 0.82rem;
             font-weight: 700;
         }
 
-        .measurement-grid {
+        .measurement-grid,
+        .result-meta {
             display: grid;
-            grid-template-columns: repeat(3, minmax(90px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .result-meta {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin-top: 8px;
         }
 
         .measurement-item {
+            min-width: 0;
             color: var(--industrial-text-muted);
-            font-size: 0.8rem;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .measurement-item strong {
             display: block;
-            color: #e0e0e0;
-            font-size: 1rem;
-            margin-top: 4px;
-        }
-
-        #inspection-section h2 {
-            margin-bottom: 8px;
-            font-size: 1.25rem;
-        }
-
-        #inspection-section .camera-section {
-            padding: 12px;
-            margin-bottom: 0;
-        }
-
-        #inspection-section .camera-controls {
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .inspection-tuning {
-            display: grid;
-            grid-template-columns: repeat(6, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .tuning-control {
-            background: var(--industrial-bg);
-            border: 1px solid var(--industrial-border);
-            border-radius: 8px;
-            padding: 8px 10px;
-        }
-
-        .tuning-control label {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            color: var(--industrial-text-muted);
-            font-size: 0.72rem;
-            margin-bottom: 6px;
-        }
-
-        .tuning-control strong {
-            color: #e0e0e0;
-            font-size: 0.78rem;
-        }
-
-        .tuning-control input,
-        .tuning-control select {
-            width: 100%;
-        }
-
-        #inspection-section .camera-select,
-        #inspection-section .btn {
-            min-height: 28px;
-            padding: 6px 12px;
-            font-size: 0.75rem;
-        }
-
-        #inspection-section .video-container {
-            gap: 12px;
-        }
-
-        #inspection-section .camera-frame {
-            padding: 8px;
-        }
-
-        #inspection-section .camera-frame h3 {
-            margin-bottom: 6px;
-            font-size: 0.82rem;
-        }
-
-        #inspection-section .camera-frame img {
-            height: clamp(260px, 50vh, 430px);
-            min-height: 0;
-        }
-
-        #cameraStatus {
-            min-height: 18px;
-            margin-top: 6px;
-            font-size: 0.78rem;
-        }
-
-        .inspection-stats {
-            margin-top: 8px;
-        }
-
-        .inspection-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(80px, 1fr));
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .inspection-stats-grid .stat-card {
-            padding: 8px 10px;
-            border-radius: 8px;
-        }
-
-        .inspection-stats-grid .stat-header {
-            margin-bottom: 2px;
-            font-size: 0.68rem;
-        }
-
-        .inspection-stats-grid .stat-value {
-            margin-bottom: 0;
-            font-size: 1.2rem;
-        }
-
-        #liveDetectionResults.inspection-results {
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 6px;
-            margin-top: 0;
-        }
-
-        #liveDetectionResults .detection-result-card {
-            padding: 8px 9px;
-            min-width: 0;
-        }
-
-        #liveDetectionResults .detection-result-title {
-            align-items: center;
-            margin-bottom: 5px;
-            font-size: 0.8rem;
-        }
-
-        #liveDetectionResults .measurement-grid {
-            grid-template-columns: repeat(3, minmax(52px, 1fr));
-            gap: 5px;
-        }
-
-        #liveDetectionResults .measurement-item {
-            min-width: 0;
-            font-size: 0.66rem;
-        }
-
-        #liveDetectionResults .measurement-item strong {
             overflow: hidden;
-            margin-top: 1px;
-            font-size: 0.74rem;
+            margin-top: 4px;
+            color: var(--industrial-text);
+            font-size: 0.82rem;
+            font-weight: 700;
             text-overflow: ellipsis;
+            text-transform: none;
             white-space: nowrap;
         }
 
-        #liveDetectionResults .detection-badge {
-            flex: 0 0 auto;
-            padding: 3px 7px;
-            margin: 0;
-            font-size: 0.62rem;
+        #inspection-section .inspection-results {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
         }
 
-        #liveDetectionResults .result-meta {
-            display: grid;
-            grid-template-columns: minmax(64px, 0.8fr) minmax(110px, 1.2fr);
-            gap: 5px;
-            margin-top: 5px;
+        #inspection-section .detection-result-card {
+            min-height: 118px;
+            padding: 10px;
+        }
+
+        #inspection-section .detection-result-title {
+            margin-bottom: 10px;
+            font-size: 0.72rem;
+        }
+
+        #inspection-section .detection-badge {
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-size: 0.58rem;
+        }
+
+        #inspection-section .measurement-grid,
+        #inspection-section .result-meta {
+            gap: 7px;
+        }
+
+        #inspection-section .measurement-item {
+            font-size: 0.58rem;
+        }
+
+        #inspection-section .measurement-item strong {
+            font-size: 0.7rem;
         }
 
         .logs-table {
             width: 100%;
-            border-collapse: collapse;
+            min-width: 680px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
         }
 
-        .logs-table th, .logs-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--industrial-border);
+        #recentLogs {
+            min-width: 620px;
         }
 
         .logs-table th {
+            background: rgba(155, 70, 255, 0.08);
             color: var(--industrial-text-muted);
+            padding: 12px 16px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid var(--industrial-border);
+            text-align: left;
+        }
+
+        .logs-table td {
+            padding: 14px 16px;
+            font-size: 0.8rem;
+            color: var(--industrial-text);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             font-weight: 500;
         }
 
-        .alert-toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--industrial-danger);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
+        .logs-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .logs-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* --- CONVEYOR DIRECTION INDICATOR --- */
+        .direction-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-            z-index: 1000;
+            justify-content: center;
+            gap: 24px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--industrial-border);
+            margin-top: 20px;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .direction-indicator span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
         }
 
-        .tab-content {
-            display: none;
+        #directionText {
+            color: var(--industrial-accent);
+            font-size: 0.85rem;
         }
 
-        .tab-content.active {
-            display: block;
+        #inspection-section .direction-indicator {
+            display: flex;
+            margin-top: 10px;
+            padding: 10px 12px;
+            overflow: hidden;
         }
 
+        #inspection-section .direction-indicator > div {
+            width: 100%;
+            min-height: 22px;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .event-log {
+            height: 180px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        #inspection-section .event-log {
+            font-size: 0.7rem;
+        }
+
+        #inspection-section .event-log > div {
+            min-height: 31px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- UPLOAD AREA --- */
         .upload-area {
-            border: 2px dashed var(--industrial-border);
+            border: 2px dashed rgba(155, 70, 255, 0.4);
             border-radius: 12px;
-            padding: 40px;
+            padding: 48px 24px;
             text-align: center;
             cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
             transition: all 0.3s;
         }
 
         .upload-area:hover {
             border-color: var(--industrial-accent);
-            background: rgba(0, 168, 255, 0.05);
+            background: rgba(0, 229, 255, 0.03);
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.05);
         }
 
-        .preview-container {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+        .upload-area i {
+            color: var(--industrial-text-muted);
+            margin-bottom: 14px;
+            transition: color 0.3s;
         }
 
-        .image-preview {
-            flex: 2;
+        .upload-area:hover i {
+            color: var(--industrial-accent);
         }
 
-        .results-panel {
-            flex: 1;
-            background: var(--industrial-bg);
+        /* --- TOAST ALERT --- */
+        .alert-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--industrial-danger);
+            color: white;
+            padding: 14px 24px;
             border-radius: 8px;
-            padding: 20px;
-        }
-
-        .gauge-bar {
-            background: var(--industrial-border);
-            border-radius: 10px;
-            height: 24px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .gauge-fill {
-            background: linear-gradient(90deg, var(--industrial-success), var(--industrial-accent));
-            width: 0%;
-            height: 100%;
-            border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-            font-size: 0.75rem;
-            font-weight: bold;
+            gap: 12px;
+            box-shadow: 0 8px 24px rgba(255, 71, 87, 0.3);
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            background: var(--industrial-border);
-            border-radius: 3px;
+        @keyframes slideIn {
+            from { transform: translateY(20px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--industrial-accent);
-            cursor: pointer;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chart-card canvas { max-height: 240px; }
 
-        .direction-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            padding: 15px;
-            background: var(--industrial-bg);
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .direction-arrow {
-            font-size: 24px;
-        }
-
-        .event-log {
-            height: 200px;
-            overflow-y: auto;
-            background: var(--industrial-bg);
-            border-radius: 8px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
+        /* --- RESPONSIVE RESPONSIVENESS --- */
+        @media (max-width: 1200px) {
+            .dashboard-board { grid-template-columns: 1fr; }
+            .live-qc-layout { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .search-shell { width: 100%; }
         }
 
         @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar .logo h2, .sidebar .logo p, .sidebar .nav-item span { display: none; }
-            .sidebar .nav-item { justify-content: center; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .dashboard { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .nav-menu { flex-direction: row; overflow-x: auto; padding: 10px; }
+            .logo { display: none; }
+            .nav-item span { display: none; }
+            .nav-item { padding: 0 12px; }
             .video-container { grid-template-columns: 1fr; }
+            .live-camera-card .camera-controls,
+            .live-camera-card .inspection-tuning,
+            .live-conveyor-card .stats-grid,
+            .live-conveyor-card .camera-controls {
+                grid-template-columns: 1fr;
+            }
+            #inspection-section .inspection-stats-grid,
+            #inspection-section .inspection-results {
+                grid-template-columns: 1fr;
+            }
+            .main-content { padding: 0 16px 16px; }
         }
     </style>
 </head>
@@ -569,18 +1144,15 @@
     <div class="dashboard">
         <div class="sidebar">
             <div class="logo">
-                <h2><i class="fas fa-industry"></i> BEARING</h2>
-                <p>Quality Control System</p>
+                <h2><i class="fas fa-industry"></i> QC SYSTEM</h2>
+                <p>Bearing Quality Control</p>
             </div>
             <div class="nav-menu">
                 <div class="nav-item active" onclick="switchSection('dashboard')">
                     <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
                 </div>
                 <div class="nav-item" onclick="switchSection('inspection')">
-                    <i class="fas fa-camera"></i><span>Inspection</span>
-                </div>
-                <div class="nav-item" onclick="switchSection('conveyor')">
-                    <i class="fas fa-cogs"></i><span>Conveyor Control</span>
+                    <i class="fas fa-camera"></i><span>Live QC</span>
                 </div>
                 <div class="nav-item" onclick="switchSection('upload')">
                     <i class="fas fa-upload"></i><span>Upload Image</span>
@@ -595,27 +1167,74 @@
         </div>
 
         <div class="main-content">
-            <!-- Dashboard Section -->
-            <div id="dashboard-section" class="tab-content active">
-                <h2><i class="fas fa-chart-line"></i> Production Dashboard</h2>
-                <div class="stats-grid" id="statsGrid"></div>
-                <div class="camera-section">
-                    <h3><i class="fas fa-chart-simple"></i> Daily Production Target</h3>
-                    <div class="gauge-bar"><div class="gauge-fill" id="targetGauge">0%</div></div>
+            <div class="topbar">
+                <div class="search-shell">
+                    <span>Search inspection, log, image...</span>
+                    <i class="fas fa-search"></i>
                 </div>
-                <div class="camera-section">
-                    <h3><i class="fas fa-clock"></i> Recent Inspections</h3>
-                    <table class="logs-table" id="recentLogs">
-                        <thead><tr><th>Time</th><th>Class</th><th>Status</th><th>Shift</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+                <div class="system-strip">
+                    <div class="status-chip"><i class="fas fa-database"></i> SQLite QC</div>
+                    <div class="status-chip"><i class="fas fa-video"></i> Socket Live</div>
+                    <div class="status-chip"><i class="fas fa-microchip"></i> <span id="arduinoText">Arduino Check</span></div>
                 </div>
             </div>
 
-            <!-- Inspection Section -->
+            <div id="dashboard-section" class="tab-content active">
+                <div class="page-heading">
+                    <div>
+                        <div class="page-kicker">Dashboard / QC Home</div>
+                        <h2>Production Dashboard</h2>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid"></div>
+                
+                <div class="dashboard-board">
+                    <div class="camera-section">
+                        <h3><i class="fas fa-chart-pie"></i> Production Snapshot</h3>
+                        <p class="panel-subtitle">Target progress and bearing mix ratio overview.</p>
+                        <div class="target-value">
+                            <strong id="targetValue">0%</strong>
+                            <span>Achievement</span>
+                        </div>
+                        <div class="gauge-bar">
+                            <div class="gauge-fill" id="targetGauge">0%</div>
+                        </div>
+                        <div id="bearingMix" class="bearing-mix"></div>
+                    </div>
+                    
+                    <div class="camera-section" style="overflow-x: auto;">
+                        <h3><i class="fas fa-clock"></i> Recent Inspections</h3>
+                        <p class="panel-subtitle">Latest quality control results from live line telemetry.</p>
+                        <table class="logs-table" id="recentLogs">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Bearing</th>
+                                    <th>Status</th>
+                                    <th>OD</th>
+                                    <th>ID</th>
+                                    <th>Shift</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="inspection-section" class="tab-content">
-                <h2><i class="fas fa-video"></i> Live Inspection</h2>
-                <div class="camera-section">
+                <div class="page-heading">
+                    <div>
+                        <div class="page-kicker">Live QC / Camera Station</div>
+                        <h2>Live QC Station</h2>
+                    </div>
+                </div>
+
+                <div class="live-qc-layout">
+                    <div class="live-qc-left">
+                <div class="camera-section live-camera-card">
+                    <h3><i class="fas fa-video"></i> 1. Live Inspection - Camera Station</h3>
                     <div class="camera-controls">
                         <select id="cameraSelect" class="camera-select">
                             <option value="1">USB Camera (Index 1)</option>
@@ -626,25 +1245,26 @@
                         <button class="btn btn-danger" onclick="stopCamera()"><i class="fas fa-stop"></i> Stop</button>
                         <button class="btn btn-warning" onclick="testCameras()"><i class="fas fa-search"></i> Test</button>
                     </div>
+                    
                     <div class="inspection-tuning">
                         <div class="tuning-control">
-                            <label>Threshold Jenis <strong id="thresholdValue">40%</strong></label>
+                            <label><span>Threshold Jenis</span><strong id="thresholdValue">40%</strong></label>
                             <input id="thresholdControl" type="range" min="5" max="95" value="40" step="5" oninput="updateCameraSettingLabels()" onchange="sendCameraSettings()">
                         </div>
                         <div class="tuning-control">
-                            <label>Threshold Model 1 <strong id="assemblyThresholdValue">20%</strong></label>
+                            <label><span>Threshold Model 1</span><strong id="assemblyThresholdValue">20%</strong></label>
                             <input id="assemblyThresholdControl" type="range" min="5" max="95" value="20" step="5" oninput="updateCameraSettingLabels()" onchange="sendCameraSettings()">
                         </div>
                         <div class="tuning-control">
-                            <label>Zoom <strong id="zoomValue">1.0x</strong></label>
+                            <label><span>Zoom</span><strong id="zoomValue">1.0x</strong></label>
                             <input id="zoomControl" type="range" min="1" max="3" value="1" step="0.1" oninput="updateCameraSettingLabels()" onchange="sendCameraSettings()">
                         </div>
                         <div class="tuning-control">
-                            <label>Pencahayaan <strong id="brightnessValue">0</strong></label>
+                            <label><span>Pencahayaan</span><strong id="brightnessValue">0</strong></label>
                             <input id="brightnessControl" type="range" min="-80" max="80" value="0" step="5" oninput="updateCameraSettingLabels()" onchange="sendCameraSettings()">
                         </div>
                         <div class="tuning-control">
-                            <label>Noise <strong id="noiseValue">Off</strong></label>
+                            <label><span>Noise</span><strong id="noiseValue">Off</strong></label>
                             <select id="noiseControl" onchange="updateCameraSettingLabels(); sendCameraSettings();">
                                 <option value="0">Off</option>
                                 <option value="1">Low</option>
@@ -653,10 +1273,11 @@
                             </select>
                         </div>
                         <div class="tuning-control">
-                            <label>Batas Big <strong id="bigWidthValue">145 px</strong></label>
+                            <label><span>Batas Big</span><strong id="bigWidthValue">145 px</strong></label>
                             <input id="bigWidthControl" type="range" min="60" max="320" value="145" step="5" oninput="updateCameraSettingLabels()" onchange="sendCameraSettings()">
                         </div>
                     </div>
+                    
                     <div class="video-container">
                         <div class="camera-frame">
                             <h3><i class="fas fa-brain"></i> Frame 1 - YOLO Model</h3>
@@ -667,166 +1288,164 @@
                             <img id="opencvFrame" src="">
                         </div>
                     </div>
-                    <div id="cameraStatus"></div>
-                    <div id="inspectionStats" class="inspection-stats" style="display:none">
+                    <div class="camera-meta-row">
+                        <span id="cameraStatus">Camera Status: Standby</span>
+                        <span>FPS: --</span>
+                        <span>Resolution: --</span>
+                        <span>Last Frame: --:--:--</span>
+                    </div>
+                    <div id="inspectionStats" style="display:none;">
                         <div class="inspection-stats-grid">
-                            <div class="stat-card"><div class="stat-header">OK</div><div class="stat-value" id="liveOk">0</div></div>
-                            <div class="stat-card"><div class="stat-header">WARNING</div><div class="stat-value" id="liveWarning">0</div></div>
-                            <div class="stat-card"><div class="stat-header">REJECT</div><div class="stat-value" id="liveReject">0</div></div>
-                            <div class="stat-card"><div class="stat-header">TOTAL</div><div class="stat-value" id="liveTotal">0</div></div>
+                            <div class="stat-card"><div class="metric-label">OK</div><div class="metric-value" id="liveOk">0</div></div>
+                            <div class="stat-card"><div class="metric-label">Warning</div><div class="metric-value" id="liveWarning">0</div></div>
+                            <div class="stat-card"><div class="metric-label">Reject</div><div class="metric-value" id="liveReject">0</div></div>
+                            <div class="stat-card"><div class="metric-label">Total</div><div class="metric-value" id="liveTotal">0</div></div>
                         </div>
-                        <div id="liveDetectionResults" class="inspection-results">
-                            <div class="detection-result-card">
-                                <div class="detection-result-title">
-                                    <span>Belum ada bearing terdeteksi</span>
-                                </div>
-                                <div class="measurement-item">Arahkan bearing ke kamera untuk melihat jenis, OD, dan ID.</div>
+                    </div>
+                    <div id="liveDetectionResults" class="inspection-results">
+                        <div class="detection-result-card">
+                            <div class="detection-result-title">
+                                <span>Belum ada bearing terdeteksi</span>
                             </div>
+                            <div class="measurement-item">Arahkan bearing ke kamera untuk melihat jenis, OD, dan ID.</div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Conveyor Control Section -->
-            <div id="conveyor-section" class="tab-content">
-                <h2><i class="fas fa-cogs"></i> Conveyor Control System</h2>
-                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-card">
-                        <div class="stat-header"><i class="fas fa-play-circle"></i> Conveyor Status</div>
-                        <div class="stat-value" id="conveyorRunningStatus" style="color:#ff3b3b">● STOPPED</div>
-                        <div id="conveyorStatusDetail">Ready</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header"><i class="fas fa-tachometer-alt"></i> Speed</div>
-                        <div class="stat-value" id="conveyorSpeedValue">70%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header"><i class="fas fa-chart-line"></i> Production</div>
-                        <div class="stat-value" id="totalCountValue">0</div>
-                        <div id="defectCountValue">Defects: 0</div>
-                    </div>
-                </div>
-
-                <div class="camera-section">
-                    <h3><i class="fas fa-sliders-h"></i> Controls</h3>
-                    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-                        <button class="btn btn-success" id="conveyorStartBtn" onclick="controlConveyor('start')">
-                            <i class="fas fa-play"></i> START
-                        </button>
-                        <button class="btn btn-danger" id="conveyorStopBtn" onclick="controlConveyor('stop')">
-                            <i class="fas fa-stop"></i> STOP
-                        </button>
-                        <button class="btn btn-purple" onclick="reverseConveyor()">
-                            <i class="fas fa-exchange-alt"></i> REVERSE
-                        </button>
-                        <button class="btn btn-warning" onclick="resetConveyorCounter()">
-                            <i class="fas fa-sync-alt"></i> Reset Counter
-                        </button>
                     </div>
 
-                    <div style="margin-bottom: 20px;">
-                        <label>Speed: <span id="speedLabel">70%</span></label>
+                    <div class="live-qc-right">
+                <div class="camera-section live-conveyor-card">
+                    <h3><i class="fas fa-cogs"></i> 2. Conveyor Control System</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="metric-label">Conveyor Status</div>
+                            <div class="metric-value" id="conveyorRunningStatus" style="color:var(--industrial-danger);">STOPPED</div>
+                            <div id="conveyorStatusDetail" style="font-size:0.75rem; color:var(--industrial-text-muted); margin-top:5px;">Ready</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="metric-label">Speed Parameter</div>
+                            <div class="metric-value" id="conveyorSpeedValue">70%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="metric-label">Total / Defects</div>
+                            <div class="metric-value" id="totalCountValue">0</div>
+                            <div id="defectCountValue" style="font-size:0.75rem; color:var(--industrial-danger); margin-top:5px;">Defects: 0</div>
+                        </div>
+                    </div>
+
+                    <div class="camera-controls">
+                        <button class="btn btn-success" id="conveyorStartBtn" onclick="controlConveyor('start')"><i class="fas fa-play"></i> START</button>
+                        <button class="btn btn-danger" id="conveyorStopBtn" onclick="controlConveyor('stop')"><i class="fas fa-stop"></i> STOP</button>
+                        <button class="btn btn-purple" onclick="reverseConveyor()"><i class="fas fa-exchange-alt"></i> REVERSE</button>
+                        <button class="btn btn-warning" onclick="resetConveyorCounter()"><i class="fas fa-sync-alt"></i> Reset Counter</button>
+                    </div>
+
+                    <div class="speed-control">
+                        <label>Speed Modifier <span id="speedLabel" style="color:var(--industrial-accent)">70%</span></label>
                         <input type="range" id="conveyorSpeedSlider" min="10" max="100" value="70" oninput="updateSpeedLabel(this.value)">
                     </div>
-
-                    <div style="margin: 20px 0;">
-                        <label><input type="checkbox" id="autoStopCheckbox" onchange="toggleAutoStop(this.checked)"> 
-                            <i class="fas fa-robot"></i> Auto-stop on defect
-                        </label>
-                    </div>
+                    <label class="auto-stop-row">
+                        <input type="checkbox" id="autoStopCheckbox" onchange="toggleAutoStop(this.checked)">
+                        Auto-stop on defect
+                    </label>
 
                     <div class="direction-indicator">
-                        <span><i class="fas fa-arrow-left"></i> LEFT</span>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span id="directionArrow" style="font-size: 28px;">➡️</span>
-                            <span id="directionText" style="font-size: 14px;">RIGHT → LEFT</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="directionArrow">&rarr;</span>
+                            <span id="directionText">RIGHT &rarr; LEFT</span>
                         </div>
-                        <span>RIGHT <i class="fas fa-arrow-right"></i></span>
                     </div>
                 </div>
 
-                <div class="camera-section">
-                    <h3><i class="fas fa-history"></i> Event Log</h3>
-                    <div id="conveyorEventLog" class="event-log">
-                        <div style="color: var(--industrial-text-muted); text-align: center;">No events recorded</div>
-                    </div>
+                <div class="camera-section event-card">
+                    <h3><i class="fas fa-receipt"></i> 3. Automation Events</h3>
+                    <div id="conveyorEventLog" class="event-log" style="margin-top: 10px;"></div>
                 </div>
-
-                <div class="camera-section">
-                    <h3><i class="fas fa-plug"></i> Arduino Connection</h3>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <div id="arduinoStatus" style="display: flex; align-items: center; gap: 8px;">
-                            <span id="arduinoLed" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ff3b3b;"></span>
-                            <span id="arduinoText">Checking...</span>
-                        </div>
-                        <button class="btn btn-warning" onclick="checkPorts()" style="padding: 5px 12px;">
-                            <i class="fas fa-search"></i> Scan Ports
-                        </button>
-                    </div>
-                    <div id="portList" style="margin-top: 10px; font-size: 12px; display: none;">
-                        <strong>Available Ports:</strong>
-                        <div id="portListContent"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Upload Section -->
             <div id="upload-section" class="tab-content">
-                <h2><i class="fas fa-upload"></i> Upload Image</h2>
+                <div class="page-heading">
+                    <div>
+                        <div class="page-kicker">Offline QC / Image Test</div>
+                        <h2>Upload Local File</h2>
+                    </div>
+                </div>
                 <div class="camera-section">
                     <div class="upload-area" onclick="document.getElementById('imageInput').click()">
                         <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="uploadImage(this)">
-                        <i class="fas fa-cloud-upload-alt" style="font-size: 48px;"></i>
-                        <p>Click or drag image here</p>
-                        <p style="font-size: 12px;">Supported: JPG, PNG, JPEG</p>
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 54px;"></i>
+                        <p style="font-size: 1rem; font-weight: 600; margin-top: 8px;">Click or drag raw image file here</p>
+                        <p style="font-size: 12px; color: var(--industrial-text-muted); margin-top: 4px;">Supports PNG, JPG, JPEG standard production outputs</p>
                     </div>
-                    <div id="uploadPreview" style="display:none; margin-top:20px">
-                        <div class="preview-container">
-                            <div class="image-preview"><img id="previewImg" style="max-width:100%; border-radius:8px"></div>
-                            <div class="results-panel">
-                                <h3>Result</h3>
-                                <div id="detectionResults"></div>
-                                <div id="statistics"></div>
+                    <div id="uploadPreview" style="display:none; margin-top:24px">
+                        <div class="dashboard-board">
+                            <div><img id="previewImg" style="width:100%; border-radius:10px; border:1px solid var(--industrial-border)"></div>
+                            <div class="camera-section" style="margin-bottom: 0;">
+                                <h3>Analysis Result</h3>
+                                <div id="detectionResults" style="margin-top:15px;"></div>
+                                <div id="statistics" style="font-weight:700; font-size:1rem; margin-top:15px;"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- History Section -->
             <div id="history-section" class="tab-content">
-                <h2><i class="fas fa-history"></i> History Log</h2>
-                <div class="camera-section">
+                <div class="page-heading">
+                    <div>
+                        <div class="page-kicker">Traceability / SQLite Log</div>
+                        <h2>History Log Table</h2>
+                    </div>
+                </div>
+                <div class="camera-section" style="overflow-x: auto;">
                     <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap">
                         <select id="filterClass" class="camera-select">
-                            <option value="">All</option>
+                            <option value="">All Classes</option>
                             <option value="small">Small (OK)</option>
                             <option value="medium">Medium (Warning)</option>
                             <option value="large">Large (Reject)</option>
-                            <option value="no_bearing">No Bearing</option>
                         </select>
                         <input type="date" id="filterDateFrom" class="camera-select">
                         <input type="date" id="filterDateTo" class="camera-select">
-                        <button class="btn btn-primary" onclick="loadHistory()"><i class="fas fa-search"></i> Search</button>
-                        <button class="btn btn-success" onclick="exportData()"><i class="fas fa-download"></i> Export CSV</button>
+                        <button class="btn btn-primary" onclick="loadHistory()"><i class="fas fa-search"></i> Query</button>
+                        <button class="btn btn-success" onclick="exportData()"><i class="fas fa-download"></i> CSV Export</button>
                     </div>
                     <table class="logs-table" id="historyTable">
-                        <thead><tr><th>Time</th><th>Class</th><th>Confidence</th><th>Status</th><th>Shift</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Bearing</th>
+                                <th>Model Class</th>
+                                <th>Conf.</th>
+                                <th>OD</th>
+                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Result</th>
+                                <th>Image Reference</th>
+                                <th>Shift</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Reports Section -->
             <div id="reports-section" class="tab-content">
-                <h2><i class="fas fa-chart-line"></i> Quality Reports</h2>
-                <div class="stats-grid">
-                    <div class="camera-section"><h3>Defect Rate Trend</h3><canvas id="defectRateChart"></canvas></div>
-                    <div class="camera-section"><h3>Class Distribution</h3><canvas id="classDistributionChart"></canvas></div>
+                <div class="page-heading">
+                    <div>
+                        <div class="page-kicker">Reports / Quality Trend</div>
+                        <h2>Analytics Reports</h2>
+                    </div>
+                </div>
+                <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="camera-section chart-card"><h3>Defect Rate Trend</h3><canvas id="defectRateChart"></canvas></div>
+                    <div class="camera-section chart-card"><h3>Bearing Type Distribution</h3><canvas id="classDistributionChart"></canvas></div>
                 </div>
                 <div class="camera-section">
-                    <h3>Generate Report</h3>
-                    <div style="display:flex; gap:10px">
+                    <h3><i class="fas fa-calendar-days"></i> Report Range</h3>
+                    <div class="camera-controls" style="margin-bottom:0;">
                         <input type="date" id="reportStart" class="camera-select">
                         <input type="date" id="reportEnd" class="camera-select">
                         <button class="btn btn-success" onclick="generateReport()">Generate</button>
@@ -839,62 +1458,162 @@
     <script>
         const socket = io();
         let defectRateChart, classDistributionChart;
-        let conveyorEvents = [];
 
-        // Initialize charts
         function initCharts() {
+            Chart.defaults.color = '#9587a8';
+            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.05)';
+            Chart.defaults.font.family = "'Montserrat', 'Segoe UI', sans-serif";
+
             defectRateChart = new Chart(document.getElementById('defectRateChart'), {
                 type: 'bar',
-                data: { labels: [], datasets: [{ label: 'Defect Rate %', data: [], backgroundColor: '#ff3b3b' }] }
+                data: { labels: [], datasets: [{ label: 'Defect Rate %', data: [], backgroundColor: '#ff4757', borderRadius: 6 }] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { boxWidth: 12 } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+                }
             });
             classDistributionChart = new Chart(document.getElementById('classDistributionChart'), {
                 type: 'pie',
-                data: { labels: ['Small', 'Medium', 'Large', 'No Bearing'], datasets: [{ data: [0,0,0,0], backgroundColor: ['#00c853','#ff9800','#ff3b3b','#8a8f9a'] }] }
+                data: { labels: ['688Z', '608Z', '6301Z', 'Unknown'], datasets: [{ data: [0,0,0,0], backgroundColor: ['#2ed573','#ffa502','#00e5ff','#9b46ff'], borderColor: '#06020f', borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }
 
-        // Navigation
         function switchSection(section) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`${section}-section`).classList.add('active');
             event.target.closest('.nav-item').classList.add('active');
-            
+
             if (section === 'dashboard') loadDashboard();
+            if (section === 'inspection') { loadConveyorStatus(); checkPorts(); }
             if (section === 'history') loadHistory();
-            if (section === 'conveyor') { loadConveyorStatus(); checkPorts(); }
+            if (section === 'reports') loadReports();
         }
 
-        // Dashboard
+        function getHistoryStatus(log) {
+            const measurement = log.measurement || {};
+            return log.status || measurement.status || 'UNKNOWN';
+        }
+
+        function getHistoryBadgeClass(log) {
+            const status = getHistoryStatus(log);
+            if (status === 'PASS') return 'badge-ok';
+            if (status === 'REJECT') return 'badge-reject';
+            return 'badge-warning';
+        }
+
+        function shortText(value, maxLength = 28) {
+            const text = String(value || '-');
+            return text.length > maxLength ? `${text.slice(0, maxLength - 3)}...` : text;
+        }
+
+        function formatMeasurement(value) {
+            if (value === null || value === undefined || Number.isNaN(Number(value))) return 'N/A';
+            return `${Number(value).toFixed(2)} mm`;
+        }
+
+        function normalizeClassName(className) {
+            return String(className || '').trim().toLowerCase().replace(/[-\s]+/g, '_');
+        }
+
+        function getSizeClass(detection) {
+            const normalized = detection.normalized_class || normalizeClassName(detection.class);
+            if (normalized.includes('small')) return 'small';
+            if (normalized.includes('medium')) return 'medium';
+            if (normalized.includes('large') || normalized.includes('big')) return 'large';
+            return normalized;
+        }
+
+        function getBearingType(detection) {
+            if (detection.measurement && detection.measurement.class) return detection.measurement.class;
+            const classMap = { small: '688Z', medium: '608Z', large: '6301Z' };
+            return classMap[getSizeClass(detection)] || detection.class || '-';
+        }
+
         async function loadDashboard() {
-            const res = await fetch('/api/dashboard');
-            const data = await res.json();
-            
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-header">Today's Production</div><div class="stat-value">${data.total}</div></div>
-                <div class="stat-card"><div class="stat-header">OK (Small)</div><div class="stat-value" style="color:#00c853">${data.small}</div></div>
-                <div class="stat-card"><div class="stat-header">Warning (Medium)</div><div class="stat-value" style="color:#ff9800">${data.medium}</div></div>
-                <div class="stat-card"><div class="stat-header">Reject (Large)</div><div class="stat-value" style="color:#ff3b3b">${data.large}</div></div>
-                <div class="stat-card"><div class="stat-header">Defect Rate</div><div class="stat-value">${data.defect_rate.toFixed(1)}%</div></div>
-                <div class="stat-card"><div class="stat-header">Target Achievement</div><div class="stat-value">${data.target_achievement.toFixed(1)}%</div></div>
-            `;
-            
-            document.getElementById('targetGauge').style.width = `${Math.min(data.target_achievement, 100)}%`;
-            document.getElementById('targetGauge').innerHTML = `${Math.min(data.target_achievement, 100).toFixed(0)}%`;
-            
-            const tbody = document.querySelector('#recentLogs tbody');
-            tbody.innerHTML = data.recent_logs.map(l => `
-                <tr>
-                    <td>${new Date(l.timestamp).toLocaleTimeString()}</td>
-                    <td><span class="detection-badge ${l.class === 'small' ? 'badge-ok' : l.class === 'medium' ? 'badge-warning' : 'badge-reject'}">${l.class}</span></td>
-                    <td>${l.class === 'small' ? 'OK' : l.class === 'medium' ? 'Warning' : 'Reject'}</td>
-                    <td>${l.shift}</td>
-                </tr>
-            `).join('');
-            if (data.recent_logs.length === 0) tbody.innerHTML = '<tr><td colspan="4">No records</td></tr>';
+            try {
+                const res = await fetch('/api/dashboard?scope=all');
+                const data = await res.json();
+                const total = Math.max(Number(data.total || 0), 1);
+                const target = Math.min(Number(data.target_achievement || 0), 100);
+                const mixPercent = value => Math.round((Number(value || 0) / total) * 100);
+
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card metric-card" style="--accent:#00e5ff">
+                        <div class="metric-top">
+                            <div><div class="metric-label">Total Inspections</div><div class="metric-value">${data.total || 0}</div></div>
+                            <div class="metric-icon"><i class="fas fa-clipboard-check"></i></div>
+                        </div>
+                        <div class="metric-note">All inspection records in dashboard scope.</div>
+                    </div>
+                    <div class="stat-card metric-card" style="--accent:#2ed573">
+                        <div class="metric-top">
+                            <div><div class="metric-label">Passed (OK)</div><div class="metric-value">${data.ok || 0}</div></div>
+                            <div class="metric-icon"><i class="fas fa-check"></i></div>
+                        </div>
+                        <div class="metric-note">${mixPercent(data.ok)}% items clear tolerance.</div>
+                    </div>
+                    <div class="stat-card metric-card" style="--accent:#ff4757">
+                        <div class="metric-top">
+                            <div><div class="metric-label">Rejected</div><div class="metric-value">${data.reject || 0}</div></div>
+                            <div class="metric-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                        </div>
+                        <div class="metric-note">${Number(data.defect_rate || 0).toFixed(1)}% defect rate.</div>
+                    </div>
+                    <div class="stat-card metric-card" style="--accent:#9b46ff">
+                        <div class="metric-top">
+                            <div><div class="metric-label">Unknown</div><div class="metric-value">${data.unknown || 0}</div></div>
+                            <div class="metric-icon"><i class="fas fa-circle-question"></i></div>
+                        </div>
+                        <div class="metric-note">Rows that need status review.</div>
+                    </div>
+                `;
+
+                document.getElementById('targetGauge').style.width = `${target}%`;
+                document.getElementById('targetGauge').innerHTML = `${target.toFixed(0)}%`;
+                document.getElementById('targetValue').innerHTML = `${target.toFixed(1)}%`;
+
+                document.getElementById('bearingMix').innerHTML = [
+                    { label: '688Z', value: data.small, color: '#2ed573' },
+                    { label: '608Z', value: data.medium, color: '#ffa502' },
+                    { label: '6301Z', value: data.large, color: '#00e5ff' },
+                    { label: 'Unknown', value: data.unknown, color: '#9b46ff' }
+                ].map(item => {
+                    const pct = mixPercent(item.value);
+                    return `
+                        <div class="mix-row" style="--accent:${item.color}; --mix:${pct}%">
+                            <strong>${item.label}</strong>
+                            <div class="mix-bar"><div class="mix-fill"></div></div>
+                            <span>${item.value || 0}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                const logs = data.recent_logs || [];
+                const tbody = document.querySelector('#recentLogs tbody');
+                tbody.innerHTML = logs.map(l => {
+                    const measurement = l.measurement || {};
+                    const status = getHistoryStatus(l);
+                    return `
+                        <tr>
+                            <td>${new Date(l.timestamp).toLocaleTimeString()}</td>
+                            <td>${measurement.class || getBearingType(l)}</td>
+                            <td><span class="detection-badge ${getHistoryBadgeClass(l)}">${status}</span></td>
+                            <td>${formatMeasurement(measurement.outer_diameter_mm)}</td>
+                            <td>${formatMeasurement(measurement.inner_diameter_mm)}</td>
+                            <td>${l.shift || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+                if (logs.length === 0) tbody.innerHTML = '<tr><td colspan="6">No records</td></tr>';
+            } catch(error) {
+                console.error('Error loading dashboard:', error);
+            }
         }
 
-        // History
         async function loadHistory() {
             let url = '/api/logs?limit=100';
             const classFilter = document.getElementById('filterClass').value;
@@ -903,24 +1622,32 @@
             if (classFilter) url += `&class=${classFilter}`;
             if (dateFrom) url += `&date_from=${dateFrom}`;
             if (dateTo) url += `&date_to=${dateTo}`;
-            
+
             const res = await fetch(url);
             const data = await res.json();
-            
             const tbody = document.querySelector('#historyTable tbody');
-            tbody.innerHTML = data.logs.map(l => `
-                <tr>
-                    <td>${new Date(l.timestamp).toLocaleString()}</td>
-                    <td><span class="detection-badge ${l.class === 'small' ? 'badge-ok' : l.class === 'medium' ? 'badge-warning' : 'badge-reject'}">${l.class}</span></td>
-                    <td>${l.confidence}%</td>
-                    <td>${l.class === 'small' ? 'OK' : l.class === 'medium' ? 'Warning' : 'Reject'}</td>
-                    <td>${l.shift}</td>
-                </tr>
-            `).join('');
-            if (data.logs.length === 0) tbody.innerHTML = '<tr><td colspan="5">No records</td></tr>';
+            const logs = data.logs || [];
+            tbody.innerHTML = logs.map(l => {
+                const measurement = l.measurement || {};
+                const status = getHistoryStatus(l);
+                return `
+                    <tr>
+                        <td>${new Date(l.timestamp).toLocaleString()}</td>
+                        <td>${measurement.class || getBearingType(l)}</td>
+                        <td><span class="detection-badge ${getHistoryBadgeClass(l)}">${l.class || '-'}</span></td>
+                        <td>${Number(l.confidence || 0).toFixed(1)}%</td>
+                        <td>${formatMeasurement(measurement.outer_diameter_mm)}</td>
+                        <td>${formatMeasurement(measurement.inner_diameter_mm)}</td>
+                        <td><span class="detection-badge ${getHistoryBadgeClass(l)}">${status}</span></td>
+                        <td title="${measurement.reason || '-'}">${shortText(measurement.reason)}</td>
+                        <td title="${l.image_name || '-'}">${shortText(l.image_name, 32)}</td>
+                        <td>${l.shift || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+            if (logs.length === 0) tbody.innerHTML = '<tr><td colspan="10">No records</td></tr>';
         }
 
-        // Export
         async function exportData() {
             const res = await fetch('/api/export', { method: 'POST' });
             const blob = await res.blob();
@@ -932,157 +1659,130 @@
             URL.revokeObjectURL(url);
         }
 
+        async function loadReports(dateFrom = '', dateTo = '') {
+            const params = new URLSearchParams();
+            if (dateFrom) params.set('date_from', dateFrom);
+            if (dateTo) params.set('date_to', dateTo);
+            const query = params.toString();
+            const res = await fetch(`/api/reports${query ? `?${query}` : ''}`);
+            const data = await res.json();
+
+            const daily = data.daily || [];
+            defectRateChart.data.labels = daily.map(item => item.date);
+            defectRateChart.data.datasets[0].data = daily.map(item => Number(item.defect_rate || 0).toFixed(1));
+            defectRateChart.update();
+
+            const distribution = data.bearing_distribution || {};
+            classDistributionChart.data.datasets[0].data = [
+                distribution['688Z'] || 0,
+                distribution['608Z'] || 0,
+                distribution['6301Z'] || 0,
+                distribution.Unknown || 0
+            ];
+            classDistributionChart.update();
+        }
+
         function generateReport() {
-            alert('Report generation started. Check console for details.');
+            const dateFrom = document.getElementById('reportStart').value;
+            const dateTo = document.getElementById('reportEnd').value || dateFrom;
+            loadReports(dateFrom, dateTo);
         }
 
-        // Conveyor Control
-        async function loadConveyorStatus() {
-            try {
-                const res = await fetch('/api/conveyor/status');
-                const data = await res.json();
-                
-                const statusElem = document.getElementById('conveyorRunningStatus');
-                if (data.running) {
-                    statusElem.innerHTML = '● RUNNING';
-                    statusElem.style.color = '#00c853';
-                } else {
-                    statusElem.innerHTML = '● STOPPED';
-                    statusElem.style.color = '#ff3b3b';
-                }
-                
-                document.getElementById('conveyorStatusDetail').innerHTML = data.last_stop_reason || 'Ready';
-                document.getElementById('conveyorSpeedValue').innerHTML = `${data.speed}%`;
-                document.getElementById('conveyorSpeedSlider').value = data.speed;
-                document.getElementById('speedLabel').innerHTML = `${data.speed}%`;
-                document.getElementById('totalCountValue').innerHTML = data.total_count || 0;
-                document.getElementById('defectCountValue').innerHTML = `Defects: ${data.defect_count || 0}`;
-                document.getElementById('autoStopCheckbox').checked = data.auto_stop;
-                
-                document.getElementById('conveyorStartBtn').disabled = data.running;
-                document.getElementById('conveyorStopBtn').disabled = !data.running;
-                
-                // Update direction display
-                if (data.direction) {
-                    updateDirectionDisplay(data.direction);
-                }
-            } catch (error) {
-                console.error('Error loading conveyor status:', error);
+        async function uploadImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('image', file);
+
+            document.getElementById('uploadPreview').style.display = 'block';
+            document.getElementById('previewImg').src = URL.createObjectURL(file);
+            document.getElementById('detectionResults').innerHTML = 'Processing analysis...';
+
+            const res = await fetch('/detect', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('previewImg').src = `data:image/jpeg;base64,${data.image}`;
+                document.getElementById('detectionResults').innerHTML = renderAssemblyResult(data.assembly) + renderDetectionResults(data.detections || []);
+                document.getElementById('statistics').innerHTML = `Total Objects Verified: ${data.total || 0}`;
             }
         }
 
-        function updateDirectionDisplay(direction) {
-            const arrow = document.getElementById('directionArrow');
-            const text = document.getElementById('directionText');
-            if (direction === 'LEFT_TO_RIGHT') {
-                arrow.innerHTML = '⬅️';
-                text.innerHTML = 'LEFT → RIGHT';
-            } else {
-                arrow.innerHTML = '➡️';
-                text.innerHTML = 'RIGHT → LEFT';
+        function getBadgeClass(detection) {
+            const status = detection.status || (detection.measurement && detection.measurement.status);
+            if (status === 'PASS') return 'badge-ok';
+            if (status === 'REJECT') return 'badge-reject';
+            return 'badge-warning';
+        }
+
+        function renderDetectionResults(detections) {
+            if (!detections || detections.length === 0) {
+                return `
+                    <div class="detection-result-card">
+                        <div class="detection-result-title"><span>Belum ada bearing terdeteksi</span></div>
+                        <div class="measurement-item">Arahkan bearing ke kamera untuk melihat jenis, OD, dan ID.</div>
+                    </div>
+                `;
             }
+
+            return detections.map((d, index) => {
+                const measurement = d.measurement || {};
+                const status = d.status || measurement.status || '-';
+                const statusClass = status === 'PASS' ? 'pass' : status === 'REJECT' ? 'reject' : '';
+                const sourceText = d.class_source === 'bbox_size'
+                    ? 'Size lock'
+                    : d.class_source === 'bbox_width'
+                        ? 'Big width'
+                        : d.class_source === 'slot_position'
+                            ? 'Slot lock'
+                            : d.class_source === 'similar_area'
+                                ? 'Area match'
+                                : 'YOLO';
+                return `
+                    <div class="detection-result-card ${statusClass}">
+                        <div class="detection-result-title">
+                            <span>Bearing ${index + 1}: ${getBearingType(d)}</span>
+                            <span class="detection-badge ${getBadgeClass(d)}">${status}</span>
+                        </div>
+                        <div class="measurement-grid">
+                            <div class="measurement-item">Confidence<strong>${d.confidence || 0}%</strong></div>
+                            <div class="measurement-item">OD<strong>${formatMeasurement(measurement.outer_diameter_mm)}</strong></div>
+                            <div class="measurement-item">ID<strong>${formatMeasurement(measurement.inner_diameter_mm)}</strong></div>
+                        </div>
+                        <div class="result-meta">
+                            <div class="measurement-item">Source<strong>${sourceText}</strong></div>
+                            <div class="measurement-item">Result<strong>${measurement.reason || status}</strong></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        async function controlConveyor(action) {
-            const res = await fetch(`/api/conveyor/${action}`, { method: 'POST' });
-            if (res.ok) loadConveyorStatus();
-        }
+        function renderAssemblyResult(assembly) {
+            if (!assembly) return '';
+            const status = assembly.status || 'REJECT';
+            const statusClass = status === 'PASS' ? 'pass' : 'reject';
+            const badgeClass = status === 'PASS' ? 'badge-ok' : 'badge-reject';
+            const objects = assembly.objects || [];
+            const labels = objects.length
+                ? objects.map(o => `${o.label} ${(Number(o.confidence) * 100).toFixed(1)}%`).join(', ')
+                : (assembly.message || 'Tidak ada part terdeteksi');
 
-        async function reverseConveyor() {
-            const res = await fetch('/api/conveyor/reverse', { method: 'POST' });
-            if (res.ok) {
-                addConveyorEvent('🔄 Conveyor direction reversed', 'warning');
-                loadConveyorStatus();
-            }
-        }
-
-        async function updateConveyorSpeed() {
-            const speed = document.getElementById('conveyorSpeedSlider').value;
-            await fetch('/api/conveyor/speed', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ speed: parseInt(speed) })
-            });
-            loadConveyorStatus();
-        }
-
-        function updateSpeedLabel(value) {
-            document.getElementById('speedLabel').innerHTML = `${value}%`;
-        }
-
-        async function toggleAutoStop(enabled) {
-            await fetch('/api/conveyor/auto-stop', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ enabled })
-            });
-            loadConveyorStatus();
-        }
-
-        async function resetConveyorCounter() {
-            await fetch('/api/conveyor/reset-counter', { method: 'POST' });
-            loadConveyorStatus();
-            addConveyorEvent('Production counter reset', 'info');
-        }
-
-        function addConveyorEvent(message, type = 'info') {
-            const colors = { success: '#00c853', danger: '#ff3b3b', warning: '#ff9800', info: '#8a8f9a' };
-            const div = document.createElement('div');
-            div.style.padding = '8px';
-            div.style.borderBottom = '1px solid #2a3440';
-            div.innerHTML = `<span style="color: ${colors[type]}">[${new Date().toLocaleTimeString()}]</span> ${message}`;
-            const container = document.getElementById('conveyorEventLog');
-            container.insertBefore(div, container.firstChild);
-            while (container.children.length > 50) container.removeChild(container.lastChild);
-        }
-
-        // Port detection
-        async function checkPorts() {
-            try {
-                const res = await fetch('/api/ports');
-                const data = await res.json();
-                
-                const led = document.getElementById('arduinoLed');
-                const text = document.getElementById('arduinoText');
-                
-                if (data.arduino_connected) {
-                    led.style.backgroundColor = '#00c853';
-                    text.innerHTML = '✅ Arduino Connected';
-                } else {
-                    led.style.backgroundColor = '#ff3b3b';
-                    text.innerHTML = '❌ Arduino Not Connected';
-                }
-                
-                const portListDiv = document.getElementById('portList');
-                const portContent = document.getElementById('portListContent');
-                if (data.ports.length > 0) {
-                    portContent.innerHTML = data.ports.map(p => `<div>📌 ${p.device} - ${p.description}</div>`).join('');
-                    portListDiv.style.display = 'block';
-                    setTimeout(() => portListDiv.style.display = 'none', 8000);
-                }
-            } catch (error) {
-                console.error('Error checking ports:', error);
-            }
-        }
-
-        // Camera functions
-        function startCamera() {
-            const index = parseInt(document.getElementById('cameraSelect').value);
-            sendCameraSettings();
-            socket.emit('start_camera', { index });
-            document.getElementById('cameraStatus').innerHTML = '<span class="loading">Starting...</span>';
-        }
-
-        function stopCamera() {
-            socket.emit('stop_camera');
-            document.getElementById('inspectionStats').style.display = 'none';
-            document.getElementById('yoloFrame').src = '';
-            document.getElementById('opencvFrame').src = '';
-            document.getElementById('liveDetectionResults').innerHTML = renderDetectionResults([]);
-        }
-
-        function testCameras() {
-            socket.emit('test_cameras');
+            return `
+                <div class="detection-result-card ${statusClass}">
+                    <div class="detection-result-title">
+                        <span>Kelengkapan Part Bearing</span>
+                        <span class="detection-badge ${badgeClass}">${status}</span>
+                    </div>
+                    <div class="measurement-grid">
+                        <div class="measurement-item">Status<strong>${assembly.status_kelengkapan || '-'}</strong></div>
+                        <div class="measurement-item">Model<strong>YOLO 1</strong></div>
+                        <div class="measurement-item">Object<strong>${objects.length}</strong></div>
+                    </div>
+                    <div class="result-meta" style="grid-template-columns: 1fr;">
+                        <div class="measurement-item">Deteksi<strong>${labels}</strong></div>
+                    </div>
+                </div>
+            `;
         }
 
         function collectCameraSettings() {
@@ -1136,189 +1836,164 @@
             }
         }
 
-        function normalizeClassName(className) {
-            return String(className || '').trim().toLowerCase().replace(/[-\s]+/g, '_');
+        function startCamera() {
+            const index = parseInt(document.getElementById('cameraSelect').value);
+            sendCameraSettings();
+            socket.emit('start_camera', { index });
+            document.getElementById('cameraStatus').innerHTML = '<span style="color:#00e5ff;">Starting camera...</span>';
         }
 
-        function getSizeClass(detection) {
-            const normalized = detection.normalized_class || normalizeClassName(detection.class);
-            if (normalized.includes('small')) return 'small';
-            if (normalized.includes('medium')) return 'medium';
-            if (normalized.includes('large') || normalized.includes('big')) return 'large';
-            return normalized;
+        function stopCamera() {
+            socket.emit('stop_camera');
+            document.getElementById('inspectionStats').style.display = 'none';
+            document.getElementById('yoloFrame').src = '';
+            document.getElementById('opencvFrame').src = '';
+            document.getElementById('liveDetectionResults').innerHTML = renderDetectionResults([]);
         }
 
-        function getBearingType(detection) {
-            if (detection.measurement && detection.measurement.class) {
-                return detection.measurement.class;
-            }
-
-            const classMap = {
-                small: '688Z',
-                medium: '608Z',
-                large: '6301Z'
-            };
-            return classMap[getSizeClass(detection)] || detection.class || '-';
+        function testCameras() {
+            socket.emit('test_cameras');
         }
 
-        function formatMeasurement(value) {
-            if (value === null || value === undefined || Number.isNaN(Number(value))) {
-                return 'N/A';
-            }
-            return `${Number(value).toFixed(2)} mm`;
-        }
-
-        function getBadgeClass(detection) {
-            const status = detection.status || (detection.measurement && detection.measurement.status);
-            if (status === 'PASS') return 'badge-ok';
-            if (status === 'REJECT') return 'badge-reject';
-            const sizeClass = getSizeClass(detection);
-            return sizeClass === 'small' ? 'badge-ok' : sizeClass === 'medium' ? 'badge-warning' : 'badge-reject';
-        }
-
-        function renderDetectionResults(detections) {
-            if (!detections || detections.length === 0) {
-                return `
-                    <div class="detection-result-card">
-                        <div class="detection-result-title">
-                            <span>Belum ada bearing terdeteksi</span>
-                        </div>
-                        <div class="measurement-item">Arahkan bearing ke kamera untuk melihat jenis, OD, dan ID.</div>
-                    </div>
-                `;
-            }
-
-            return detections.map((d, index) => {
-                const measurement = d.measurement || {};
-                const status = d.status || measurement.status || '-';
-                const statusClass = status === 'PASS' ? 'pass' : status === 'REJECT' ? 'reject' : '';
-                const sourceText = d.class_source === 'bbox_size'
-                    ? 'Size lock'
-                    : d.class_source === 'bbox_width'
-                        ? 'Big width'
-                    : d.class_source === 'slot_position'
-                        ? 'Slot lock'
-                        : d.class_source === 'similar_area'
-                            ? 'Area match'
-                        : 'YOLO';
-                return `
-                    <div class="detection-result-card ${statusClass}">
-                        <div class="detection-result-title">
-                            <span>Bearing ${index + 1}: ${getBearingType(d)}</span>
-                            <span class="detection-badge ${getBadgeClass(d)}">${status}</span>
-                        </div>
-                        <div class="measurement-grid">
-                            <div class="measurement-item">Confidence<strong>${d.confidence}%</strong></div>
-                            <div class="measurement-item">OD<strong>${formatMeasurement(measurement.outer_diameter_mm)}</strong></div>
-                            <div class="measurement-item">ID Info<strong>${formatMeasurement(measurement.inner_diameter_mm)}</strong></div>
-                        </div>
-                        <div class="result-meta">
-                            <div class="measurement-item">Source<strong>${sourceText}</strong></div>
-                            <div class="measurement-item">Result<strong>${measurement.reason || status}</strong></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderAssemblyResult(assembly) {
-            if (!assembly) return '';
-            const status = assembly.status || 'REJECT';
-            const statusClass = status === 'PASS' ? 'pass' : 'reject';
-            const badgeClass = status === 'PASS' ? 'badge-ok' : 'badge-reject';
-            const objects = assembly.objects || [];
-            const labels = objects.length
-                ? objects.map(o => `${o.label} ${(Number(o.confidence) * 100).toFixed(1)}%`).join(', ')
-                : (assembly.message || 'Tidak ada part terdeteksi');
-
-            return `
-                <div class="detection-result-card ${statusClass}">
-                    <div class="detection-result-title">
-                        <span>Kelengkapan Part Bearing</span>
-                        <span class="detection-badge ${badgeClass}">${status}</span>
-                    </div>
-                    <div class="measurement-grid">
-                        <div class="measurement-item">Status<strong>${assembly.status_kelengkapan || '-'}</strong></div>
-                        <div class="measurement-item">Model<strong>YOLO 1</strong></div>
-                        <div class="measurement-item">Object<strong>${objects.length}</strong></div>
-                    </div>
-                    <div class="result-meta" style="grid-template-columns: 1fr;">
-                        <div class="measurement-item">Deteksi<strong>${labels}</strong></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Upload image
-        async function uploadImage(input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            const formData = new FormData();
-            formData.append('image', file);
-            
-            document.getElementById('uploadPreview').style.display = 'block';
-            document.getElementById('previewImg').src = URL.createObjectURL(file);
-            document.getElementById('detectionResults').innerHTML = '<div class="loading"></div> Processing...';
-            
-            const res = await fetch('/detect', { method: 'POST', body: formData });
-            const data = await res.json();
-            
-            if (data.success) {
-                document.getElementById('previewImg').src = `data:image/jpeg;base64,${data.image}`;
-                document.getElementById('detectionResults').innerHTML = renderAssemblyResult(data.assembly) + renderDetectionResults(data.detections);
-                document.getElementById('statistics').innerHTML = `<div style="margin-top: 16px;"><strong>Total:</strong> ${data.total}</div>`;
+        async function loadConveyorStatus() {
+            try {
+                const res = await fetch('/api/conveyor/status');
+                const data = await res.json();
+                const statusElem = document.getElementById('conveyorRunningStatus');
+                if (data.running) {
+                    statusElem.innerHTML = 'RUNNING';
+                    statusElem.style.color = 'var(--industrial-success)';
+                } else {
+                    statusElem.innerHTML = 'STOPPED';
+                    statusElem.style.color = 'var(--industrial-danger)';
+                }
+                document.getElementById('conveyorStatusDetail').innerHTML = data.last_stop_reason || 'Ready';
+                document.getElementById('conveyorSpeedValue').innerHTML = `${data.speed}%`;
+                document.getElementById('conveyorSpeedSlider').value = data.speed;
+                document.getElementById('speedLabel').innerHTML = `${data.speed}%`;
+                document.getElementById('totalCountValue').innerHTML = data.total_count || 0;
+                document.getElementById('defectCountValue').innerHTML = `Defects: ${data.defect_count || 0}`;
+                document.getElementById('autoStopCheckbox').checked = Boolean(data.auto_stop);
+                document.getElementById('conveyorStartBtn').disabled = data.running;
+                document.getElementById('conveyorStopBtn').disabled = !data.running;
+                if (data.direction) updateDirectionDisplay(data.direction);
+            } catch (error) {
+                console.error('Error loading conveyor status:', error);
             }
         }
 
-        // Socket events
+        function updateDirectionDisplay(direction) {
+            const arrow = document.getElementById('directionArrow');
+            const text = document.getElementById('directionText');
+            if (direction === 'LEFT_TO_RIGHT') {
+                arrow.innerHTML = '&larr;';
+                text.innerHTML = 'LEFT &rarr; RIGHT';
+            } else {
+                arrow.innerHTML = '&rarr;';
+                text.innerHTML = 'RIGHT &rarr; LEFT';
+            }
+        }
+
+        async function controlConveyor(action) {
+            const res = await fetch(`/api/conveyor/${action}`, { method: 'POST' });
+            if (res.ok) loadConveyorStatus();
+        }
+
+        async function reverseConveyor() {
+            const res = await fetch('/api/conveyor/reverse', { method: 'POST' });
+            if (res.ok) {
+                addConveyorEvent('Conveyor direction reversed', 'warning');
+                loadConveyorStatus();
+            }
+        }
+
+        async function updateConveyorSpeed() {
+            const speed = document.getElementById('conveyorSpeedSlider').value;
+            await fetch('/api/conveyor/speed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ speed: parseInt(speed) })
+            });
+            loadConveyorStatus();
+        }
+
+        function updateSpeedLabel(value) {
+            document.getElementById('speedLabel').innerHTML = `${value}%`;
+        }
+
+        async function toggleAutoStop(enabled) {
+            await fetch('/api/conveyor/auto-stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ enabled })
+            });
+            loadConveyorStatus();
+        }
+
+        async function resetConveyorCounter() {
+            await fetch('/api/conveyor/reset-counter', { method: 'POST' });
+            loadConveyorStatus();
+            addConveyorEvent('Production counter reset', 'info');
+        }
+
+        function addConveyorEvent(message, type = 'info') {
+            const colors = { success: '#2ed573', danger: '#ff4757', warning: '#ffa502', info: '#9587a8' };
+            const div = document.createElement('div');
+            div.style.padding = '8px';
+            div.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+            div.innerHTML = `<span style="color:${colors[type]}">[${new Date().toLocaleTimeString()}]</span> ${message}`;
+            const container = document.getElementById('conveyorEventLog');
+            container.insertBefore(div, container.firstChild);
+            while (container.children.length > 50) container.removeChild(container.lastChild);
+        }
+
+        async function checkPorts() {
+            try {
+                const res = await fetch('/api/ports');
+                const data = await res.json();
+                document.getElementById('arduinoText').innerHTML = data.arduino_connected ? 'Arduino Connected' : 'Arduino Offline';
+            } catch (error) {
+                document.getElementById('arduinoText').innerHTML = 'Arduino Unknown';
+            }
+        }
+
         socket.on('connect', () => console.log('Connected to server'));
-
-        socket.on('camera_settings', (settings) => {
-            applyCameraSettings(settings);
-        });
-        
-        socket.on('camera_status', (data) => {
+        socket.on('camera_settings', settings => applyCameraSettings(settings));
+        socket.on('camera_status', data => {
             if (data.status === 'started') {
-                document.getElementById('cameraStatus').innerHTML = '<span style="color: #00c853;">● Camera active</span>';
+                document.getElementById('cameraStatus').innerHTML = '<span style="color:var(--industrial-success);">Camera active</span>';
                 document.getElementById('inspectionStats').style.display = 'block';
             } else if (data.status === 'stopped') {
-                document.getElementById('cameraStatus').innerHTML = '<span style="color: #ff3b3b;">● Camera stopped</span>';
+                document.getElementById('cameraStatus').innerHTML = '<span style="color:var(--industrial-danger);">Camera stopped</span>';
                 document.getElementById('yoloFrame').src = '';
                 document.getElementById('opencvFrame').src = '';
                 document.getElementById('inspectionStats').style.display = 'none';
             } else {
-                document.getElementById('cameraStatus').innerHTML = `<span style="color: #ff3b3b;">❌ ${data.message}</span>`;
+                document.getElementById('cameraStatus').innerHTML = `<span style="color:var(--industrial-danger);">${data.message}</span>`;
             }
         });
-        
-        // Di bagian socket.on('frame', ...) tambahkan filter
-        socket.on('frame', (data) => {
+
+        socket.on('frame', data => {
             document.getElementById('yoloFrame').src = `data:image/jpeg;base64,${data.yolo_image || data.image}`;
             document.getElementById('opencvFrame').src = `data:image/jpeg;base64,${data.opencv_image || data.image}`;
-            let ok = 0, warn = 0, rej = 0;
+            const detections = data.detections || [];
+            const validDetections = detections.filter(d => ['small', 'medium', 'large'].includes(getSizeClass(d)));
             const assembly = data.assembly || null;
-            
-            // Filter bearing classes from model aliases, for example SMALL_BEARING.
-            const validDetections = data.detections.filter(d => 
-                ['small', 'medium', 'large'].includes(getSizeClass(d))
-            );
-            
+            let ok = 0, warn = 0, rej = 0;
             validDetections.forEach(d => {
                 const status = d.status || (d.measurement && d.measurement.status);
                 if (status === 'PASS') ok++;
                 else if (status === 'REJECT') rej++;
                 else warn++;
             });
-
             document.getElementById('liveOk').innerHTML = ok;
             document.getElementById('liveWarning').innerHTML = warn;
             document.getElementById('liveReject').innerHTML = rej;
             document.getElementById('liveTotal').innerHTML = validDetections.length;
             document.getElementById('liveDetectionResults').innerHTML = renderAssemblyResult(assembly) + renderDetectionResults(validDetections);
         });
-        
-        socket.on('defect_alert', (data) => {
+
+        socket.on('defect_alert', data => {
             const toast = document.createElement('div');
             toast.className = 'alert-toast';
             toast.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message}`;
@@ -1326,8 +2001,8 @@
             setTimeout(() => toast.remove(), 5000);
             addConveyorEvent(data.message, 'danger');
         });
-        
-        socket.on('conveyor_event', (data) => {
+
+        socket.on('conveyor_event', data => {
             let type = 'info';
             if (data.action === 'started') type = 'success';
             if (data.action === 'stopped' || data.action === 'auto_stopped') type = 'danger';
@@ -1335,20 +2010,18 @@
             addConveyorEvent(data.message, type);
             loadConveyorStatus();
         });
-        
-        socket.on('cameras_available', (data) => {
+
+        socket.on('cameras_available', data => {
             const select = document.getElementById('cameraSelect');
             select.innerHTML = '';
-            data.cameras.forEach(cam => {
+            (data.cameras || []).forEach(cam => {
                 select.innerHTML += `<option value="${cam.index}">${cam.name}</option>`;
             });
-            if (data.cameras.length === 0) alert('No cameras detected');
+            if (!data.cameras || data.cameras.length === 0) alert('No cameras detected');
         });
-        
-        // Event listeners
+
         document.getElementById('conveyorSpeedSlider').addEventListener('change', updateConveyorSpeed);
-        
-        // Initialize
+
         initCharts();
         loadDashboard();
         loadCameraSettings();

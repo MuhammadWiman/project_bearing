@@ -14,7 +14,7 @@ from fastapi.templating import Jinja2Templates
 BASE_DIR = Path(__file__).resolve().parent
 os.environ.setdefault("YOLO_CONFIG_DIR", str(BASE_DIR / "Ultralytics"))
 
-from config import ARDUINO_PORT, BAUD_RATE, MODEL_PATH, MODEL_1_PATH
+from config import ARDUINO_PORT, BAUD_RATE, MODEL_PATH, MODEL_1_PATH, INSPECTION_DB_PATH
 from arduino_controller import ArduinoController
 from conveyor_controller import ConveyorController
 from inspection_manager import InspectionManager
@@ -29,7 +29,10 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 # Initialize components
 arduino = ArduinoController(ARDUINO_PORT, BAUD_RATE)
 conveyor = ConveyorController(arduino)
-inspection = InspectionManager(str(BASE_DIR / "inspection_log.json"))
+inspection = InspectionManager(
+    str(BASE_DIR / INSPECTION_DB_PATH),
+    legacy_json_file=str(BASE_DIR / "inspection_log.json"),
+)
 
 
 def resolve_app_path(path):
@@ -128,8 +131,8 @@ async def index(request: Request):
 
 
 @fastapi_app.get("/api/dashboard")
-async def dashboard():
-    return inspection.get_statistics()
+async def dashboard(scope: str = "today"):
+    return inspection.get_statistics(scope)
 
 
 @fastapi_app.get("/api/model-info")
@@ -164,12 +167,18 @@ async def get_logs(
     return {"logs": logs, "total": len(logs)}
 
 
+@fastapi_app.get("/api/reports")
+async def get_reports(date_from: str | None = None, date_to: str | None = None):
+    return inspection.get_report(date_from, date_to)
+
+
 @fastapi_app.post("/api/export")
 async def export():
     output = io.StringIO()
     writer = csv.DictWriter(
         output,
-        fieldnames=["timestamp", "class", "confidence", "shift", "image_name"],
+        fieldnames=["timestamp", "class", "confidence", "status", "shift", "image_name"],
+        extrasaction="ignore",
     )
     writer.writeheader()
     writer.writerows(inspection.logs)

@@ -38,6 +38,7 @@ This project implements a complete **Computer Vision-based Quality Control Syste
 |------|--------------|
 | **Backend** | FastAPI, Socket.IO ASGI, YOLOv11, OpenCV |
 | **Frontend** | HTML5, CSS3, JavaScript, Chart.js, Socket.IO |
+| **Database** | SQLite |
 | **Hardware** | Arduino Uno, Stepper Motor, USB Camera |
 
 ---
@@ -181,6 +182,7 @@ Edit `config.py`:
 ARDUINO_PORT = None
 BAUD_RATE = 9600
 DAILY_TARGET = 1000
+INSPECTION_DB_PATH = 'inspection_qc.db'
 CONFIDENCE_THRESHOLD = 0.6
 
 SHIFT_HOURS = {
@@ -189,6 +191,9 @@ SHIFT_HOURS = {
     'Night': (22, 6)
 }
 ```
+
+Data count QC dan history inspeksi disimpan di SQLite pada `inspection_qc.db`.
+Jika `inspection_log.json` lama masih ada, data tersebut dimigrasikan otomatis saat aplikasi pertama kali dijalankan dengan database kosong.
 
 ---
 
