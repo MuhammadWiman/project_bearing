@@ -556,10 +556,13 @@ class CameraHandler:
             cv2.putText(frame, line, (x, y + index * line_height), font, font_scale, (0, 255, 0), thickness + 1)
     
     def _stream(self):
+        locked_latency = 0.0
         while self.active and self.camera and self.camera.isOpened():
             ret, frame = self.camera.read()
             if not ret:
                 break
+            
+            start_time = time.perf_counter()
 
             frame = self._apply_frame_settings(frame)
             
@@ -613,11 +616,40 @@ class CameraHandler:
                         pass
             
             stats = self.inspection.get_statistics()
+            
+            end_time = time.perf_counter()
+            latency_ms = (end_time - start_time) * 1000
+            current_fps = 1000.0 / latency_ms if latency_ms > 0 else 0
+            
+            # Bekukan angka Latency saat ada bearing di layar agar mudah dicatat.
+            # Ketika mesin berhenti (STOP), bearing masih di layar, jadi angka Latency 
+            # akan tetap beku dan bisa kamu catat! FPS tetap dibiarkan berjalan (Live).
+            if detections:
+                if locked_latency == 0.0:
+                    locked_latency = latency_ms
+                    # Simpan hasil live detection ke database secara otomatis
+                    # Ini mencegah spam DB karena hanya disimpan 1x per barang lewat
+                    if self.inspection:
+                        for d in detections:
+                            self.inspection.add(
+                                class_name=d.get('class', 'Unknown'),
+                                confidence=d.get('confidence', 0.0),
+                                image_name="Live Camera",
+                                measurement=d.get('measurement'),
+                                m1_confidence=assembly.get('assembly_confidence')
+                            )
+                display_latency = locked_latency
+            else:
+                locked_latency = 0.0
+                display_latency = latency_ms
+            
+            assembly['latency_ms'] = display_latency
+            
             overlay = [
                 f"Production: {stats['total']} / {DAILY_TARGET}",
-                f"Defect Rate: {stats['defect_rate']:.1f}%",
-                f"Shift: {stats['shift']}",
-                f"Conveyor: {'RUNNING' if self.conveyor.status['running'] else 'STOPPED'} | Speed: {self.conveyor.status['speed']}%"
+                f"Defect: {stats['defect_rate']:.1f}% | Latency: {display_latency:.1f} ms",
+                f"Shift: {stats['shift']} | FPS: {current_fps:.1f}",
+                f"Conveyor: {'RUN' if self.conveyor.status['running'] else 'STOP'} | Speed: {self.conveyor.status['speed']}%"
             ]
             for i, text in enumerate(overlay):
                 y = 30 + i*25
@@ -644,6 +676,7 @@ class CameraHandler:
             self.camera.release()
     
     def detect_image(self, image_bytes):
+        start_time = time.perf_counter()
         self._reset_stabilization()
         nparr = np.frombuffer(image_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -688,6 +721,8 @@ class CameraHandler:
         
         _, buffer = cv2.imencode('.jpg', annotated)
         img_base64 = base64.b64encode(buffer).decode('utf-8')
+        
+        assembly['latency_ms'] = (time.perf_counter() - start_time) * 1000
         
         return detections, img_base64, assembly
 

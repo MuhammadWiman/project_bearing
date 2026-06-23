@@ -3,7 +3,7 @@ import os
 
 # Model
 MODEL_PATH = 'model/best.pt'
-MODEL_1_PATH = '../bearing/runs/detect/bearing_yolov8_finetune_pass_clean/weights/best.pt'
+MODEL_1_PATH = '../bearing/runs/detect/bearing_yolov8_v5/weights/best.pt'
 MODEL_1_CONFIDENCE = 0.2
 DETECTION_CONFIDENCE = 0.4
 DETECTION_IMAGE_SIZE = 640
@@ -25,12 +25,12 @@ INSPECTION_DB_PATH = 'inspection_qc.db'
 
 # Live inspection refresh interval in seconds.
 # Naikkan nilainya jika tampilan live terlalu cepat berubah.
-LIVE_INSPECTION_INTERVAL = 0.5
+LIVE_INSPECTION_INTERVAL = 0.1
 
 # Jumlah frame yang dipakai untuk voting status live agar hasil tidak mudah
 # berubah karena satu frame blur / noise.
-STABILITY_WINDOW = 4
-STABILITY_LOCK_COUNT = 3
+STABILITY_WINDOW = 3
+STABILITY_LOCK_COUNT = 2
 ASSEMBLY_STABILITY_FRAMES = STABILITY_WINDOW
 DETECTION_STABILITY_FRAMES = STABILITY_WINDOW
 DETECTION_CLASS_STABILITY_FRAMES = STABILITY_WINDOW
@@ -100,3 +100,7 @@ SHIFT_HOURS = {
     'Afternoon': (14, 22),
     'Night': (22, 6)
 }
+
+# Gemini Vision API
+GEMINI_API_KEY = "AQ.Ab8RN6LkjBZwCCUvn8C6LKLwedxhMv-uoxbVMSp2GMUg_OOdcw"
+USE_GEMINI_VERIFICATION = True

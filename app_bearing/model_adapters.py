@@ -89,15 +89,16 @@ class AssemblyDetectionModel:
                     }
                 )
 
-        status_kelengkapan = self._status_kelengkapan(objects)
+        status_kelengkapan, pass_score, reject_score = self._status_kelengkapan_and_scores(objects)
         return {
             "status_kelengkapan": status_kelengkapan,
             "status": "PASS" if status_kelengkapan == "Lengkap" else "REJECT",
             "objects": objects,
             "roi_bbox": self._select_roi_bbox(objects),
+            "assembly_confidence": max(pass_score, reject_score),
         }
 
-    def _status_kelengkapan(self, objects):
+    def _status_kelengkapan_and_scores(self, objects):
         labels = {item["normalized_label"] for item in objects}
         required = {normalize_detection_class(item) for item in REQUIRED_ASSEMBLY_CLASSES}
 
@@ -113,15 +114,17 @@ class AssemblyDetectionModel:
             ],
             default=0,
         )
-
+        
+        status = "Tidak Lengkap"
         if pass_score or reject_score:
-            return "Lengkap" if pass_score >= reject_score else "Tidak Lengkap"
-
-        if required:
-            return "Lengkap" if required.issubset(labels) else "Tidak Lengkap"
-
-        has_valid_object = any(label != "no_bearing" for label in labels)
-        return "Lengkap" if has_valid_object else "Tidak Lengkap"
+            status = "Lengkap" if pass_score >= reject_score else "Tidak Lengkap"
+        elif required:
+            status = "Lengkap" if required.issubset(labels) else "Tidak Lengkap"
+        else:
+            has_valid_object = any(label != "no_bearing" for label in labels)
+            status = "Lengkap" if has_valid_object else "Tidak Lengkap"
+            
+        return status, pass_score, reject_score
 
     def _select_roi_bbox(self, objects):
         candidates = [

@@ -19,6 +19,7 @@ from arduino_controller import ArduinoController
 from conveyor_controller import ConveyorController
 from inspection_manager import InspectionManager
 from camera_handler import CameraHandler
+from gemini_verifier import GeminiVerifier
 
 
 fastapi_app = FastAPI(title="Industrial Bearing Inspection System")
@@ -33,6 +34,13 @@ inspection = InspectionManager(
     str(BASE_DIR / INSPECTION_DB_PATH),
     legacy_json_file=str(BASE_DIR / "inspection_log.json"),
 )
+gemini = GeminiVerifier()
+
+async def verify_defect_async(record_id, img_bytes, status, class_name):
+    # Dijalankan di background agar tidak memblokir respon UI
+    reason = await asyncio.to_thread(gemini.verify_defect, img_bytes, status, class_name)
+    inspection.update_ai_reason(record_id, reason)
+
 
 
 def resolve_app_path(path):
@@ -198,12 +206,17 @@ async def detect(image: UploadFile | None = File(default=None)):
     img_bytes = await image.read()
     detections, img_base64, assembly = camera.detect_image(img_bytes)
     for detection in detections:
-        inspection.add(
+        record = inspection.add(
             detection["class"],
             detection["confidence"],
             image.filename,
             measurement=detection.get("measurement"),
+            m1_confidence=assembly.get("assembly_confidence"),
         )
+        status = detection.get("status") or (detection.get("measurement") or {}).get("status")
+        if status == "REJECT":
+            asyncio.create_task(verify_defect_async(record["id"], img_bytes, status, detection["class"]))
+            
     return {
         "success": True,
         "detections": detections,

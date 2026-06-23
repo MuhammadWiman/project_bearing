@@ -55,10 +55,12 @@ void setConveyorSpeed(int percent) {
     conveyor_running = false;
     digitalWrite(LED_GREEN, LOW);
     digitalWrite(LED_RED, HIGH);
+    digitalWrite(ENABLE_PIN, HIGH); // MATIKAN ARUS MOTOR
   } else {
     float speed = speed_map[target_speed_percent];
     stepper.setSpeed(speed);
     if (conveyor_running) {
+      digitalWrite(ENABLE_PIN, LOW); // NYALAKAN ARUS MOTOR
       // Speed akan berubah di loop berikutnya
     }
   }
@@ -86,6 +88,7 @@ void startConveyor() {
   
   digitalWrite(LED_GREEN, HIGH);
   digitalWrite(LED_RED, LOW);
+  digitalWrite(ENABLE_PIN, LOW); // NYALAKAN ARUS MOTOR SAAT START
   
   Serial.print("CONVEYOR_STARTED:SPEED=");
   Serial.print(target_speed_percent);
@@ -101,6 +104,7 @@ void stopConveyor(String reason = "Manual") {
   
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(LED_RED, HIGH);
+  digitalWrite(ENABLE_PIN, HIGH); // MATIKAN ARUS MOTOR SAAT STOP
   
   Serial.print("CONVEYOR_STOPPED:");
   Serial.println(reason);
@@ -204,8 +208,8 @@ void setup() {
   stepper.setMaxSpeed(MAX_SPEED);
   stepper.setSpeed(0);
   
-  // Enable motor driver
-  digitalWrite(ENABLE_PIN, LOW);
+  // Start with motor disabled so it doesn't heat up immediately
+  digitalWrite(ENABLE_PIN, HIGH);
   
   // Initial LED state
   digitalWrite(LED_GREEN, LOW);

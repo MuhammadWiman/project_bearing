@@ -1419,10 +1419,12 @@
                                 <th>Bearing</th>
                                 <th>Model Class</th>
                                 <th>Conf.</th>
+                                <th>M1 Conf.</th>
                                 <th>OD</th>
                                 <th>ID</th>
                                 <th>Status</th>
                                 <th>Result</th>
+                                <th>AI Verification</th>
                                 <th>Image Reference</th>
                                 <th>Shift</th>
                             </tr>
@@ -1636,16 +1638,18 @@
                         <td>${measurement.class || getBearingType(l)}</td>
                         <td><span class="detection-badge ${getHistoryBadgeClass(l)}">${l.class || '-'}</span></td>
                         <td>${Number(l.confidence || 0).toFixed(1)}%</td>
+                        <td>${l.m1_confidence ? (Number(l.m1_confidence) * 100).toFixed(1) + '%' : '-'}</td>
                         <td>${formatMeasurement(measurement.outer_diameter_mm)}</td>
                         <td>${formatMeasurement(measurement.inner_diameter_mm)}</td>
                         <td><span class="detection-badge ${getHistoryBadgeClass(l)}">${status}</span></td>
                         <td title="${measurement.reason || '-'}">${shortText(measurement.reason)}</td>
+                        <td title="${l.ai_reason || '-'}"><span style="color:#00e5ff">${shortText(l.ai_reason, 40)}</span></td>
                         <td title="${l.image_name || '-'}">${shortText(l.image_name, 32)}</td>
                         <td>${l.shift || '-'}</td>
                     </tr>
                 `;
             }).join('');
-            if (logs.length === 0) tbody.innerHTML = '<tr><td colspan="10">No records</td></tr>';
+            if (logs.length === 0) tbody.innerHTML = '<tr><td colspan="11">No records</td></tr>';
         }
 
         async function exportData() {
@@ -1776,7 +1780,7 @@
                     <div class="measurement-grid">
                         <div class="measurement-item">Status<strong>${assembly.status_kelengkapan || '-'}</strong></div>
                         <div class="measurement-item">Model<strong>YOLO 1</strong></div>
-                        <div class="measurement-item">Object<strong>${objects.length}</strong></div>
+                        <div class="measurement-item">Latency<strong>${assembly.latency_ms ? Number(assembly.latency_ms).toFixed(1) + ' ms' : '-'}</strong></div>
                     </div>
                     <div class="result-meta" style="grid-template-columns: 1fr;">
                         <div class="measurement-item">Deteksi<strong>${labels}</strong></div>

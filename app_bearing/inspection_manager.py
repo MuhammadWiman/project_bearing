@@ -37,6 +37,7 @@ class InspectionManager:
                     image_name TEXT,
                     measurement_json TEXT,
                     status TEXT,
+                    ai_reason TEXT,
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
                 """
@@ -81,8 +82,8 @@ class InspectionManager:
         return conn.execute(
             """
             INSERT INTO qc_inspections (
-                timestamp, class, confidence, shift, image_name, measurement_json, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                timestamp, class, confidence, shift, image_name, measurement_json, status, m1_confidence
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 entry.get("timestamp") or datetime.now().isoformat(),
@@ -92,6 +93,7 @@ class InspectionManager:
                 entry.get("image_name") or "upload",
                 measurement_json,
                 entry.get("status") or (measurement or {}).get("status"),
+                entry.get("m1_confidence")
             ),
         )
 
@@ -112,6 +114,8 @@ class InspectionManager:
             "image_name": row["image_name"],
             "measurement": measurement,
             "status": row["status"],
+            "ai_reason": row["ai_reason"] if "ai_reason" in row.keys() else None,
+            "m1_confidence": row["m1_confidence"] if "m1_confidence" in row.keys() else None,
         }
 
     def _size_bucket(self, class_name):
@@ -157,7 +161,7 @@ class InspectionManager:
             ).fetchall()
         return [self._row_to_dict(row) for row in rows]
 
-    def add(self, class_name, confidence, image_name="upload", measurement=None):
+    def add(self, class_name, confidence, image_name="upload", measurement=None, m1_confidence=None):
         entry = {
             "timestamp": datetime.now().isoformat(),
             "class": class_name,
@@ -166,12 +170,21 @@ class InspectionManager:
             "image_name": image_name,
             "measurement": measurement,
             "status": measurement.get("status") if measurement else None,
+            "m1_confidence": m1_confidence,
         }
         with self._lock:
             with self._connect() as conn:
                 cursor = self._insert_entry(conn, entry)
                 entry["id"] = cursor.lastrowid
         return entry
+
+    def update_ai_reason(self, record_id, reason):
+        with self._lock:
+            with self._connect() as conn:
+                conn.execute(
+                    "UPDATE qc_inspections SET ai_reason = ? WHERE id = ?",
+                    (reason, record_id)
+                )
 
     def get_current_shift(self):
         hour = datetime.now().hour
