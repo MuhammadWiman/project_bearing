@@ -1,7 +1,0 @@
-path: E:/Project/project_skripsi/bearing/dataset_detection_2class_finetune_pass_clean
-train: images/train
-val: images/valid
-test: images/test
-names:
-  0: Reject
-  1: Pass
